@@ -131,9 +131,9 @@ Table 1: System call overhead
 System Call & Time - cached($\mu$s) & Std. dev- cached & Time - uncached($\mu$s) & Std. dev - uncached\tabularnewline
 \hline 
 \hline 
-getpid() & 0.0033 & 5.13$\%$ & 0.8471 & 18\%\tabularnewline
+getpid() & 0.00358 & 1.71$\%$ & 7.89 & 5.74\%\tabularnewline
 \hline 
-write to devnull & 0.0034 & 5.12\% & 1.5071 & 23\%\tabularnewline
+write to devnull & 0.00341 & 1.06\% & 1.45 & 53\%\tabularnewline
 \hline 
 \end{tabular}
 \end{table}
@@ -147,19 +147,25 @@ is issued and immediately inside the child process. We repeat this
 process for 10, 000 iterations. To measure the creation time for a
 kernel thread - we use posix thread attributes to tie a user thread
 to a kernel level thread. We repeat these experiments 10,000 times.
-Table 2 shows the results
-
+We use the following test methodology :
+\begin{enumerate}
+\item Repeat N times
+\item Start timer
+\item Fork a process
+\item Stop timer inside the child process
+\end{enumerate}
 \begin{table}
 Table 2: Process and kernel thread creation overhead 
 
 \begin{tabular}{|c|c|c|}
 \hline 
- & Time{(}$\mu$s) & Std. deviation\tabularnewline
+ & Time($\mu$s) & Std. deviation\tabularnewline
 \hline 
 \hline 
-Process creation & 268.86 & 17\%\tabularnewline
+Process creation & 264.73 & 18.48\%\tabularnewline
 \hline 
-Kernel Thread Creation & 15.707 & 13\%\tabularnewline
+Kernel Thread Creation & 1.89 & 35\foreignlanguage{english}{\%}\selectlanguage{english}
+\tabularnewline
 \hline 
 \end{tabular}
 \end{table}
@@ -170,36 +176,41 @@ Kernel Thread Creation & 15.707 & 13\%\tabularnewline
 
 We measure context switch time by passing a token across pipes. We
 create a total of 4 pipes to accomplish a 2 way communication and
-measure the round trip time. This round trip time actually contains
-overhead of reading and writing twice to a pipe and 2 context switches
-- Thus we need to subtract the overhead. Table 3 summarizes the results.
+measure the round trip time. This roundtrip time per process contains
+time needed to conext switch twice and time for a read and write call
+using pipes. We however, do not remove the pipe overhead - that needs
+to be done. We run our experiments for N iterations
 
+This is the test methodology we use for measuring a process context
+switch time
+\begin{enumerate}
+\item Create 2 pipes for communication between process 1 and process 2 (pipe1)
+\item Create 2 pipes for communication between process 2 and process 1 (pipe2)
+\item Repeat N times
+
+\begin{enumerate}
+\item Start timer
+\item Repeat (c) -(d) for some iterations
+\item Process 1 writes to pipe1, process 2 reads it. Note that these will
+be blocking reads. This causes Process 2 to start running
+\item Process 2 writes to pipe2 and process 1 reads it. This will again
+cause a context switch
+\item Stop timer
+\end{enumerate}
+\end{enumerate}
+For Measuring kernel thread context switch time we use posix threads
+bound to kernel by setting scope attribute to PTHREAD\_SCOPE\_SYSTEM
 \begin{table}
 Table 3: Context Switching overhead
 
 \begin{tabular}{|c|c|c|}
 \hline 
- & Time {(}$\mu$s) & Std. deviation\tabularnewline
+ & Time ($\mu$s) & Std. deviation\tabularnewline
 \hline 
 \hline 
-Pipe communication overhead for process & 1.12 & 3.31\%\tabularnewline
+Process Context Switch & 2.19 & 27.8\%\tabularnewline
 \hline 
-Roundtrip time for context switch experiment & 4.34 & 15\%\tabularnewline
-\hline 
-Pipe communication overhead for kernel thread & 1.1 & 6.3\%\tabularnewline
-\hline 
-Roundtrip time for kernel context switch & 5.7 & 5.8\%\tabularnewline
-\hline 
-\end{tabular}
-
-\begin{tabular}{|c|c|}
-\hline 
- & Time $\mu$s\tabularnewline
-\hline 
-\hline 
-Process Context switch & 1.61\tabularnewline
-\hline 
-Kernel Context switch & 2.30\tabularnewline
+Kernel thread context switch & 2.65 & 38.5\%\tabularnewline
 \hline 
 \end{tabular}
 \end{table}
