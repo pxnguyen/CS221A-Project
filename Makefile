@@ -1,13 +1,11 @@
 CXX = gcc
 CXXFLAGS = -Wall
 
-all: syscall_time create_time test
+all: all_tests
 
-syscall_time: syscall_time.o conv.o
-	$(CXX) $(CXXFLAGS) syscall_time.o conv.o -o syscall_time
+all_tests: all_tests.o
+	$(CXX) $(CXXFLAGS) all_tests.o -o all_tests
 
-create_time: create_time.o conv.o
-	$(CXX) $(CXXFLAGS) create_time.o conv.o -o create_time
 clean:
-	rm -rf *.o syscall_time create_time
+	rm -rf *.o all_tests
 
