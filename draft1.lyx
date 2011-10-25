@@ -108,7 +108,87 @@ CPU Operation
 \end_layout
 
 \begin_layout Subsection
+Measurement overhead
+\end_layout
 
+\begin_layout Standard
+We are using RDTSC as a fine-grained counter to measure the performance.
+ In order to calculate the overhead of RDSTC, we run the following experiment.
+\end_layout
+
+\begin_layout Standard
+Program 1:
+\end_layout
+
+\begin_layout Itemize
+Get initial clock counter
+\end_layout
+
+\begin_layout Itemize
+Repeat N times:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Run RDTSC
+\end_layout
+
+\begin_layout Itemize
+Perform a random function f
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Return the difference between the current and the initial clock counter.
+\end_layout
+
+\begin_layout Standard
+Program 2:
+\end_layout
+
+\begin_layout Itemize
+Get initial clock counter
+\end_layout
+
+\begin_layout Itemize
+Repeat N times:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Perform a random function f
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Return the difference between the current and the initial clock counter
+\end_layout
+
+\begin_layout Standard
+We find that the variance becomes insignificant when N is around 10000.
+ We avoid the possible compiler optimization by running the random function
+ f.
+\end_layout
+
+\begin_layout Standard
+We calculate the difference in the result of Program 2 and Program 1 and
+ divide that by N to find the overhead of RDTSC.
+\end_layout
+
+\begin_layout Subsection
+Procedure call overhead
+\end_layout
+
+\begin_layout Subsection
+System call overhead
+\end_layout
+
+\begin_layout Subsection
+Task creation time
+\end_layout
+
+\begin_layout Subsection
+Context switching time
 \end_layout
 
 \end_body
