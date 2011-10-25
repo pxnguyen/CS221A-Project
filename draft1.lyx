@@ -349,7 +349,7 @@ mu$s
 
 \begin_layout Plain Layout
 Std.
- deviation- cached
+ dev- cached
 \end_layout
 
 \end_inset
@@ -381,7 +381,7 @@ mu$s
 
 \begin_layout Plain Layout
 Std.
- deviation - uncached
+ dev - uncached
 \end_layout
 
 \end_inset
@@ -410,7 +410,7 @@ getpid()
 \begin_inset Text
 
 \begin_layout Plain Layout
-5
+5.13
 \begin_inset Formula $\%$
 \end_inset
 
@@ -474,7 +474,7 @@ write to devnull
 \begin_inset Text
 
 \begin_layout Plain Layout
-5
+5.12
 \begin_inset ERT
 status open
 
