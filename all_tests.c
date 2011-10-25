@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
 #include <sched.h>
 #include <pthread.h>
@@ -43,6 +44,14 @@ typedef struct test_params {
   int append;
 } test_t;
 
+struct shared_pipes {
+  int pipe1[2];
+  int pipe2[2];
+
+  FILE *data_fp;
+  int num_rounds;
+};
+
 static void *thread_start(void *ptr)
 {
    uint64_t end = rdtsc();
@@ -77,10 +86,10 @@ void test_kthreads(test_t *test_params)
   int num_rounds = test_params->num_rounds;
   int verbose = test_params->verbose;
   uint64_t mycycles, mytime;
+  FILE *data_fp = test_params->data_fp;
  
   uint64_t total_cycles = 0;
   uint64_t total_time = 0;
-  int cpu_freq = test_params->cpu_freq;
 
   int rnd;
 
@@ -91,35 +100,32 @@ void test_kthreads(test_t *test_params)
 		return;
 	}		
 
-	mytime = convert_cycles_to_ns(cpu_freq, mycycles);
 
 	if (verbose) {
-	  printf("pid %d Iter %d cycles%llu time %llu ns\n", getpid(), rnd, mycycles, mytime);
+	  printf("pid %d Iter %d cycles%llu\n", getpid(), rnd, mycycles);
 	}
 
-	total_time += mytime;
 	total_cycles += mycycles;
+	fprintf(data_fp, "%llu \n", mycycles);
   }
  
-  printf("Avg cycles %llu Avg time :%llu \n", (total_cycles / num_rounds), (total_time / num_rounds)); 
+  printf("Avg cycles %llu \n", (total_cycles / num_rounds)); 
 }
 
 void test_creation_time(test_t *test_params)
 {
-  int num_rounds = test_params->num_rounds;
+  int num_rnds = test_params->num_rounds;
   int verbose = test_params->verbose;
   FILE *data_fp = test_params->data_fp;
   int test_num = test_params->test_num;
-  int cpu_freq = test_params->cpu_freq;
 
-  int rnd, i;
+  int i;
   uint64_t start, end;
   uint64_t mycycles;
-  uint64_t mytime;
 
   int pid;
 
-  for (rnd = 0; rnd < num_rounds; rnd++) {
+  for (i = 0; i < num_rnds; i++) {
 
 	start = rdtsc();
 	pid = fork();
@@ -130,13 +136,11 @@ void test_creation_time(test_t *test_params)
 	  
 	  mycycles = (end - start); 
 
-	  mytime = convert_cycles_to_ns(cpu_freq, mycycles);
-
 	  if (verbose) {
-	    printf("pid %d Iter %d cycles%llu time %llu ns\n", getpid(), rnd, mycycles, mytime);
+	    printf("pid %d Iter %d cycles%llu \n", getpid(), i, mycycles);
 	  }
 
-	  fprintf(data_fp, "%llu %llu\n", mycycles, mytime);
+	  fprintf(data_fp, "%llu \n", mycycles);
 
 	  exit(0);
 
@@ -146,7 +150,107 @@ void test_creation_time(test_t *test_params)
    }
 }
 
-void test_ctx_switch(test_t *test_params)
+void print_my_pipes(struct shared_pipes *mypipes) {
+	printf(" p1 :%d %d ; p2 :%d %d\n", mypipes->pipe1[0], mypipes->pipe1[1], mypipes->pipe2[0], mypipes->pipe2[1]);
+}
+
+static void *thread_fun2(void *ptr)
+{
+  char *pvt_buf = "kthread2";
+  struct shared_pipes *pipes = (struct shared_pipes *)ptr;
+  char buf[10];
+  int num_rounds = pipes->num_rounds;
+  int rnd;
+
+  read(pipes->pipe1[0], buf, 6);
+  write(pipes->pipe2[1], pvt_buf, sizeof(pvt_buf));
+
+  #if 0
+  for (rnd = 0; rnd < num_rounds; rnd++) {
+       read(pipes->pipe1[0], buf, 6);
+       //write(pipes->pipe2[1], pvt_buf, sizeof(pvt_buf));
+  }
+  #endif
+	
+  close(pipes->pipe1[0]);
+  close(pipes->pipe2[1]);
+}
+
+static void *thread_fun1(void *ptr)
+{
+  char *pvt_buf = "kthread1";
+  struct shared_pipes *pipes = (struct shared_pipes *)ptr;
+  char buf[10];
+  int num_rounds = pipes->num_rounds;
+  int rnd;
+
+  uint64_t start, end;
+
+  close(pipes->pipe1[0]);
+  close(pipes->pipe2[1]);
+
+  start = rdtsc();
+
+  write(pipes->pipe1[1], pvt_buf, sizeof(pvt_buf));
+  read(pipes->pipe2[0], buf, 6);
+  end = rdtsc();
+
+  fprintf(pipes->data_fp, "%llu \n", (end - start));
+  close(pipes->pipe1[1]);
+  close(pipes->pipe2[0]);
+}
+
+void *thread_pipe_ovhead( void *ptr)
+{
+  char *pvt_buf = "kthread1";
+  struct shared_pipes *pipes = (struct shared_pipes *)ptr;
+  char buf[10];
+  int num_rounds = pipes->num_rounds;
+  int rnd;
+
+  uint64_t start, end;
+
+  start = rdtsc();
+  write(pipes->pipe1[1], pvt_buf, sizeof(pvt_buf));
+  read(pipes->pipe1[0], buf, 6);
+  write(pipes->pipe2[1], pvt_buf, sizeof(pvt_buf));
+  read(pipes->pipe2[0], buf, 6);
+  end = rdtsc();
+
+  fprintf(pipes->data_fp, "%llu \n", (end - start));
+}
+
+void measure_kthread_pipe_overhead(test_t * test_params)
+{
+  struct shared_pipes mypipes;
+  pthread_attr_t attr1;
+  FILE *data_fp = test_params->data_fp;
+  mypipes.data_fp = data_fp;
+
+  if (pipe(mypipes.pipe1) == -1 ) {
+	perror("pipe1");
+	return;
+  }
+
+  //Create pipes
+  if (pipe(mypipes.pipe2) == -1 ) {
+    perror("pipe2");
+    return;
+  }
+
+  pthread_t thread1;
+  
+  pthread_attr_init(&attr1);
+  pthread_attr_setscope(&attr1, PTHREAD_SCOPE_SYSTEM);
+
+  if (pthread_create(&thread1, &attr1, thread_pipe_ovhead, (void *)&mypipes)) {
+	perror("pthread error");
+  }
+
+  pthread_join(thread1, NULL);
+}
+	
+void test_kthread_ctx_switch(test_t *test_params)
 {
   int num_rounds = test_params->num_rounds;
   int verbose = test_params->verbose;
@@ -157,17 +261,103 @@ void test_ctx_switch(test_t *test_params)
   int rnd, i, pid;
   uint64_t start, end;
   uint64_t mycycles;
-  uint64_t mytime;
-  uint64_t total_time = 0;
+  uint64_t total_cycles = 0;
+
+  struct shared_pipes mypipes;
+
+  mypipes.data_fp = data_fp;
+  mypipes.num_rounds = num_rounds;
+  
+  pthread_t thread1, thread2;
+  pthread_attr_t attr1, attr2;
+
+  if (pipe(mypipes.pipe1) == -1 ) {
+	perror("pipe1");
+	return;
+  }
+
+  //Create pipes
+  if (pipe(mypipes.pipe2) == -1 ) {
+    perror("pipe2");
+    return;
+  }
+
+  //print_my_pipes(&mypipes);
+  pthread_attr_init(&attr1);
+  pthread_attr_setscope(&attr1, PTHREAD_SCOPE_SYSTEM);
+
+  pthread_attr_init(&attr2);
+  pthread_attr_setscope(&attr2, PTHREAD_SCOPE_SYSTEM);
+
+  if (pthread_create(&thread1, &attr1, thread_fun1, (void *)&mypipes)) {
+	perror("pthread error");
+  }
+
+  if (pthread_create(&thread2, &attr2, thread_fun2, (void *)&mypipes)) {
+	perror("pthread error");
+  }
+
+  pthread_join(thread1, NULL);
+  pthread_join(thread2, NULL);
+}
+
+void measure_pipe_overhead(test_t *test_params)
+{
+  int pipe1[2];
+  int pipe2[2];
+  int rnd, i;
+
+  char buf[100];
+  char *pvt_buf = "fixed";
+
+  uint64_t start, end;
+  FILE *data_fp = test_params->data_fp;
+
+  if (pipe(pipe1) == -1 ) {
+	perror("pipe1");
+	return;
+  }
+
+  //Create pipes
+  if (pipe(pipe2) == -1 ) {
+    perror("pipe2");
+    return;
+  }
+
+  for (rnd = 0; rnd < test_params->num_rounds; rnd ++) {
+
+    start = rdtsc();
+    for (i = 0; i < test_params->num_iters; i ++) {
+      write(pipe1[1], pvt_buf, sizeof(pvt_buf));
+      read(pipe1[0], buf, 6);
+      write(pipe2[1], pvt_buf, sizeof(pvt_buf));
+      read(pipe2[0], buf, 6);
+    }
+    end = rdtsc();
+    fprintf(data_fp, "%llu \n", ((end - start) / test_params->num_iters));
+  }
+}
+
+uint64_t test_ctx_switch(test_t *test_params)
+{
+  int num_iters = test_params->num_iters;
+  int num_rounds = test_params->num_rounds;
+  int verbose = test_params->verbose;
+  int test_num = test_params->test_num;
+  int cpu_freq = test_params->cpu_freq;
+
+  int rnd, i, pid;
+  uint64_t start, end;
+  uint64_t mycycles;
   uint64_t total_cycles = 0;
 
   char buf[100];
   char *parent_buf = "fixed";
 
-
   int pipe1[2];
   int pipe2[2];
 
+  FILE *data_fp = test_params->data_fp;
   //Create pipes
   if (pipe(pipe1) == -1 ) {
 	perror("pipe1");
@@ -196,9 +386,11 @@ void test_ctx_switch(test_t *test_params)
 	read(pipe1[0], buf, 6);
 	write(pipe2[1], pvt_buf, sizeof(pvt_buf));
 
-	for (rnd = 1; rnd < num_rounds; rnd++) {
+  	for (rnd = 0; rnd < test_params->num_rounds; rnd++) {
+	  for (i = 0; i < num_iters; i++) {
 		read(pipe1[0], buf, 6);
 		write(pipe2[1], pvt_buf, sizeof(pvt_buf));
+	  }
 	}
 
 	close(pipe1[0]);
@@ -212,46 +404,43 @@ void test_ctx_switch(test_t *test_params)
 	write(pipe1[1], parent_buf, sizeof(parent_buf));
 	read(pipe2[0], buf, 5);
 
-	start = rdtsc();
 
-	for (rnd = 1; rnd < num_rounds; rnd++) {
-	  write(pipe1[1], parent_buf, sizeof(parent_buf));
-	  read(pipe2[0], buf, 5);
+  	for (rnd = 0; rnd < num_rounds; rnd++) {
+	  start = rdtsc();
+	  for (i = 0; i < num_iters; i++) {
+		write(pipe1[1], parent_buf, sizeof(parent_buf));
+		read(pipe2[0], buf, 5);
+	  }
+	  end = rdtsc();
+  	  mycycles = (end - start);
+
+	  fprintf(data_fp, "%llu \n", mycycles / num_iters);
 	}
 
-	end = rdtsc();
 	wait(NULL);
 
 	close(pipe1[1]);
 	close(pipe2[0]);
 
-  	mycycles = (end - start);
-
-	mytime = convert_cycles_to_ns(cpu_freq, mycycles);
 
 	if (verbose) {
-	  printf("Iter %d cycles%llu time %llu ns\n", rnd, mycycles, mytime);
+	  printf("Iter %d cycles%llu \n", rnd, mycycles);
 	}
-
-	printf("Test %d avg_cyles:%llu avg_time:%llu\n", test_num, mycycles / num_rounds, mytime / num_rounds);
+	return mycycles;
   }
 }
 
 void test_syscall_getpid(test_t *test_params)
-
 {
   int num_rounds = test_params->num_rounds;
   int num_iters = test_params->num_iters;
   int verbose = test_params->verbose;
   FILE *data_fp = test_params->data_fp;
   int test_num = test_params->test_num;
-  int cpu_freq = test_params->cpu_freq;
 
   int rnd, i;
   uint64_t start, end;
   uint64_t mycycles;
-  uint64_t mytime;
-  uint64_t total_time = 0;
   uint64_t total_cycles = 0;
 
   for (rnd = 0; rnd < num_rounds; rnd++) {
@@ -275,17 +464,11 @@ void test_syscall_getpid(test_t *test_params)
 	mycycles = (end - start) / num_iters;
 	total_cycles += mycycles;
 
-	mytime = convert_cycles_to_ns(cpu_freq, mycycles);
-	total_time += mytime;
-
 	if (verbose) {
-	  printf("Iter %d cycles%llu time %llu ns\n", rnd, mycycles, mytime);
+	  printf("Iter %d cycles%llu \n", rnd, mycycles);
 	}
-	fprintf(data_fp, "%llu %llu\n", mycycles, mytime);
+	fprintf(data_fp, "%llu \n", mycycles);
   }
-
-  printf("Test %d total_cyles %llu total_time %llu avg_cycles %llu avg_time %llu\n", test_num, total_cycles, total_time, (total_cycles / num_rounds), (total_time / num_rounds));
-
 }
 
 void test_syscall_devnull(test_t *test_params)
@@ -295,13 +478,10 @@ void test_syscall_devnull(test_t *test_params)
   int verbose = test_params->verbose;
   FILE *data_fp = test_params->data_fp;
   int test_num = test_params->test_num;
-  int cpu_freq = test_params->cpu_freq;
 
   int rnd, i;
   uint64_t start, end;
   uint64_t mycycles;
-  uint64_t mytime;
-  uint64_t total_time = 0;
   uint64_t total_cycles = 0;
 
   int fid;
@@ -335,16 +515,11 @@ void test_syscall_devnull(test_t *test_params)
 	mycycles = (end - start) / num_iters;
 	total_cycles += mycycles;
 
-	mytime = convert_cycles_to_ns(cpu_freq, mycycles);
-	total_time += mytime;
-
 	if (verbose) {
-	  printf("Iter %d cycles%llu time %llu ns\n", rnd, mycycles, mytime);
+	  printf("Iter %d cycles%llu ns\n", rnd, mycycles);
 	}
-	fprintf(data_fp, "%llu %llu\n", mycycles, mytime);
+	fprintf(data_fp, "%llu \n", mycycles);
   }
-
-  printf("Test %d total_cyles %llu total_time %llu avg_cycles %llu avg_time %llu\n", test_num, total_cycles, total_time, (total_cycles / num_rounds), (total_time / num_rounds));
 
   close(fid);
 }
@@ -401,6 +576,7 @@ int main(int argc, char **argv)
   init_test_params(&test_params);
 
   char c;
+  int i;
 
   while ((c = getopt(argc, argv, "r:n:t:f:o:vshcwa")) != -1) {
 	switch(c) {
@@ -480,6 +656,18 @@ int main(int argc, char **argv)
 	case 4:
 	  test_kthreads(&test_params);
  	break;
+
+	case 5:
+	  test_kthread_ctx_switch(&test_params);
+ 	break;
+
+	case 6:
+	  measure_kthread_pipe_overhead(&test_params);
+	break;
+
+	case 7:
+	  measure_pipe_overhead(&test_params);
+	break;
 
 	default:
 	break;

@@ -1,4 +1,1 @@
-1. all_tests - syscall overhead, process creation
-2. run_syscall_tests.sh - run uncached syscall tests
-3. run_tests.sh - run all the tests and save data in *.data files
-   
+ run_tests.sh - runs everything, after that use matlab script gen_results to cleanup data and report mean and std deviation 
