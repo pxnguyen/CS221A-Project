@@ -1,0 +1,207 @@
+%% LyX 2.0.0 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{luainputenc}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{Performance Report on EC2 Instances}
+
+
+\author{Vineet Kumar, Phuc Xuan Nguyen}
+
+\maketitle
+
+\section{Introduction}
+
+The aim of this project is to measure performance on Amazon's EC2
+instances. For the first portion of this project we measure the overhead
+of CPU, scheduling and OS services. All the code for our tests was
+written in C. We used gcc 4.6.1 with no optimizations to run our code.
+Collecting machine description information, measuring procedure call
+overhead and measurment overhead were done by Phuc Xuan Nguyen. Measurement
+of system call overhead, process creation, kernel thread creation,
+process context switch and kernel context switch were done by Vineet
+Kumar. We think we spent in total of around 7 working days for this
+portion of the project.
+
+
+\section{Machine Description}
+
+We are aiming to measure the performance on the Amazon's t1.micro
+instances.
+\begin{itemize}
+\item 1 Elastic Computing Unit
+\item Processor: Intel(c) Xeon(R) CPU E5430 @ 2.66Ghz.
+
+\begin{itemize}
+\item 12M L2 Cache, 1333 Mhz FSB
+\end{itemize}
+\item Memory: 592MiB
+\item Netword card speed
+
+\begin{itemize}
+\item Between EC2 Instances: 100MB/s
+\end{itemize}
+\item Disk: Amazon Elastic Block (EBS)
+
+\begin{itemize}
+\item Size: 7.9GB
+\end{itemize}
+\item Operating System: Ubuntu Oneric 11.10
+\end{itemize}
+
+\section{CPU Operation}
+
+For all our experiments we use RDTSC counter. To obtain time we divide
+this by the CPU frequency. Also of all the data seen, we discard the
+best and worst 10\% of data and then take mean values.
+
+
+\subsection{Measurement overhead}
+
+We are using RDTSC as a fine-grained counter to measure the performance.
+In order to calculate the overhead of RDSTC, we run the following
+experiment.
+
+Function 1:
+\begin{itemize}
+\item Get initial clock counter
+\item Repeat N times:
+
+\begin{itemize}
+\item Run RDTSC
+\item Perform a random function f
+\end{itemize}
+\item Return the difference between the current and the initial clock counter.
+\end{itemize}
+Function 2:
+\begin{itemize}
+\item Get initial clock counter
+\item Repeat N times:
+
+\begin{itemize}
+\item Perform a random function f
+\end{itemize}
+\item Return the difference between the current and the initial clock counter
+\end{itemize}
+We find that the variance becomes insignificant when N is around 10000.
+We avoid the possible compiler optimization by running the random
+function f.
+
+We calculate the difference in the result of Function 2 and Function
+1 and divide that by N to find the overhead of RDTSC. In the t1.micro
+instance.
+
+
+\subsection{Procedure call overhead}
+
+To find out the procedure call overhead, we perform two simple operations
+(int x = 1+1; int y = x;) in 9 different scenarios: no procedure call
+and procedure calls with the 0-7 parameters. Figure ? describes the
+increment in overhead.
+
+The result is gathered after running 1,000,000 iterations.
+
+\begin{figure}
+\caption{Clock cycle(param){*} -1 means no procedure call}
+\end{figure}
+
+
+
+\subsection{System call overhead}
+
+To measure system call overhead, we need to do measurements on a system call that does not do much work. We do our experiments by calling ``getpid()'' and by writing one byte to the device devnull. We notice that for both these  experiments if we run a tight loop within a single process, the system call gets cached and thus does not give us correct overhead measurements. Thus, we handle this issue by running the test within a context of different process. We run the test for 10,000 iterations. Table 1 shows the results:
+
+\begin{table}
+Table 1: System call overhead
+
+\begin{tabular}{|c|c|c|c|c|}
+\hline 
+System Call & Time - cached($\mu$s) & Std. dev- cached & Time - uncached($\mu$s) & Std. dev - uncached\tabularnewline
+\hline 
+\hline 
+getpid() & 0.0033 & 5.13$\%$ & 0.8471 & 18\%\tabularnewline
+\hline 
+write to devnull & 0.0034 & 5.12\% & 1.5071 & 23\%\tabularnewline
+\hline 
+\end{tabular}
+\end{table}
+
+
+
+\subsection{Task creation time}
+
+We measure the task creation time by calling the timer before a fork()
+is issued and immediately inside the child process. We repeat this
+process for 10, 000 iterations. To measure the creation time for a
+kernel thread - we use posix thread attributes to tie a user thread
+to a kernel level thread. We repeat these experiments 10,000 times.
+Table 2 shows the results
+
+\begin{table}
+Table 2: Process and kernel thread creation overhead 
+
+\begin{tabular}{|c|c|c|}
+\hline 
+ & Time{(}$\mu$s) & Std. deviation\tabularnewline
+\hline 
+\hline 
+Process creation & 268.86 & 17\%\tabularnewline
+\hline 
+Kernel Thread Creation & 15.707 & 13\%\tabularnewline
+\hline 
+\end{tabular}
+\end{table}
+
+
+
+\subsection{Context switching time}
+
+We measure context switch time by passing a token across pipes. We
+create a total of 4 pipes to accomplish a 2 way communication and
+measure the round trip time. This round trip time actually contains
+overhead of reading and writing twice to a pipe and 2 context switches
+- Thus we need to subtract the overhead. Table 3 summarizes the results.
+
+\begin{table}
+Table 3: Context Switching overhead
+
+\begin{tabular}{|c|c|c|}
+\hline 
+ & Time {(}$\mu$s) & Std. deviation\tabularnewline
+\hline 
+\hline 
+Pipe communication overhead for process & 1.12 & 3.31\%\tabularnewline
+\hline 
+Roundtrip time for context switch experiment & 4.34 & 15\%\tabularnewline
+\hline 
+Pipe communication overhead for kernel thread & 1.1 & 6.3\%\tabularnewline
+\hline 
+Roundtrip time for kernel context switch & 5.7 & 5.8\%\tabularnewline
+\hline 
+\end{tabular}
+
+\begin{tabular}{|c|c|}
+\hline 
+ & Time $\mu$s\tabularnewline
+\hline 
+\hline 
+Process Context switch & 1.61\tabularnewline
+\hline 
+Kernel Context switch & 2.30\tabularnewline
+\hline 
+\end{tabular}
+\end{table}
+
+\end{document}
