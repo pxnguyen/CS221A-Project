@@ -1,0 +1,115 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Performance Report on EC2 Instances
+\end_layout
+
+\begin_layout Author
+Vineet Kumar, Phuc Xuan Nguyen
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Section
+Machine Description
+\end_layout
+
+\begin_layout Standard
+We are aiming to measure the performance on the Amazon's t1.micro instances.
+\end_layout
+
+\begin_layout Itemize
+1 Elastic Computing Unit
+\end_layout
+
+\begin_layout Itemize
+Processor: Intel(c) Xeon(R) CPU E5430 @ 2.66Ghz.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+12M L2 Cache, 1333 Mhz FSB
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Memory: 592MiB
+\end_layout
+
+\begin_layout Itemize
+Netword card speed
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Between EC2 Instances: 100MB/s
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Disk: Amazon Elastic Block (EBS)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Size: 7.9GB
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Operating System: Ubuntu Oneric 11.10
+\end_layout
+
+\begin_layout Section
+CPU Operation
+\end_layout
+
+\begin_layout Subsection
+
+\end_layout
+
+\end_body
+\end_document
