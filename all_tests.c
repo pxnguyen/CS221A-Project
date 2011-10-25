@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sched.h>
+#include <pthread.h>
 #include "rdtsc.h"
 
 #define DEF_ITERS 10000
@@ -42,6 +43,67 @@ typedef struct test_params {
   int append;
 } test_t;
 
+static void *thread_start(void *ptr)
+{
+   uint64_t end = rdtsc();
+   uint64_t *pend =  (void *)ptr;
+
+   *pend = end;
+}
+
+uint64_t test_kthread_time(void)
+{
+  pthread_t thread1;
+  pthread_attr_t attr;
+  uint64_t start, pend;
+  int tid;
+
+  pthread_attr_init(&attr);
+
+  pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
+
+  start = rdtsc();
+  if (pthread_create(&thread1, &attr, thread_start, (void *)&pend)) {
+	perror("pthread error");
+	return 0;
+  }
+	
+  pthread_join(thread1, NULL);
+  return (pend - start);
+}
+
+void test_kthreads(test_t *test_params) 
+{
+  int num_rounds = test_params->num_rounds;
+  int verbose = test_params->verbose;
+  uint64_t mycycles, mytime;
+ 
+  uint64_t total_cycles = 0;
+  uint64_t total_time = 0;
+  int cpu_freq = test_params->cpu_freq;
+
+  int rnd;
+
+  for (rnd = 0; rnd < num_rounds; rnd++) {
+	mycycles = test_kthread_time();
+
+        if (0 == mycycles) {
+		return;
+	}		
+
+	mytime = convert_cycles_to_ns(cpu_freq, mycycles);
+
+	if (verbose) {
+	  printf("pid %d Iter %d cycles%llu time %llu ns\n", getpid(), rnd, mycycles, mytime);
+	}
+
+	total_time += mytime;
+	total_cycles += mycycles;
+  }
+ 
+  printf("Avg cycles %llu Avg time :%llu \n", (total_cycles / num_rounds), (total_time / num_rounds)); 
+}
+
 void test_creation_time(test_t *test_params)
 {
   int num_rounds = test_params->num_rounds;
@@ -71,7 +133,7 @@ void test_creation_time(test_t *test_params)
 	  mytime = convert_cycles_to_ns(cpu_freq, mycycles);
 
 	  if (verbose) {
-	    printf("Iter %d cycles%llu time %llu ns\n", rnd, mycycles, mytime);
+	    printf("pid %d Iter %d cycles%llu time %llu ns\n", getpid(), rnd, mycycles, mytime);
 	  }
 
 	  fprintf(data_fp, "%llu %llu\n", mycycles, mytime);
@@ -84,7 +146,149 @@ void test_creation_time(test_t *test_params)
    }
 }
 
-void test_syscall_time(test_t *test_params)
+void test_ctx_switch(test_t *test_params)
+{
+  int num_rounds = test_params->num_rounds;
+  int verbose = test_params->verbose;
+  FILE *data_fp = test_params->data_fp;
+  int test_num = test_params->test_num;
+  int cpu_freq = test_params->cpu_freq;
+
+  int rnd, i, pid;
+  uint64_t start, end;
+  uint64_t mycycles;
+  uint64_t mytime;
+  uint64_t total_time = 0;
+  uint64_t total_cycles = 0;
+
+  char buf[100];
+  char *parent_buf = "fixed";
+
+
+  int pipe1[2];
+  int pipe2[2];
+
+  //Create pipes
+  if (pipe(pipe1) == -1 ) {
+	perror("pipe1");
+	return;
+  }
+
+  //Create pipes
+  if (pipe(pipe2) == -1 ) {
+    perror("pipe2");
+    return;
+  }
+
+  pid = fork();
+
+  if (pid == -1) {
+	perror("fork");
+	return;
+  }
+
+  if (pid == 0) {
+	char *pvt_buf = "child";
+	close(pipe1[1]);
+	close(pipe2[0]);
+
+	//Warmup
+	read(pipe1[0], buf, 6);
+	write(pipe2[1], pvt_buf, sizeof(pvt_buf));
+
+	for (rnd = 1; rnd < num_rounds; rnd++) {
+		read(pipe1[0], buf, 6);
+		write(pipe2[1], pvt_buf, sizeof(pvt_buf));
+	}
+
+	close(pipe1[0]);
+	close(pipe2[1]);
+
+  } else {
+	close(pipe1[0]);
+	close(pipe2[1]);
+
+	//Warmup
+	write(pipe1[1], parent_buf, sizeof(parent_buf));
+	read(pipe2[0], buf, 5);
+
+	start = rdtsc();
+
+	for (rnd = 1; rnd < num_rounds; rnd++) {
+	  write(pipe1[1], parent_buf, sizeof(parent_buf));
+	  read(pipe2[0], buf, 5);
+	}
+
+	end = rdtsc();
+	wait(NULL);
+
+	close(pipe1[1]);
+	close(pipe2[0]);
+
+  	mycycles = (end - start);
+
+	mytime = convert_cycles_to_ns(cpu_freq, mycycles);
+
+	if (verbose) {
+	  printf("Iter %d cycles%llu time %llu ns\n", rnd, mycycles, mytime);
+	}
+
+	printf("Test %d avg_cyles:%llu avg_time:%llu\n", test_num, mycycles / num_rounds, mytime / num_rounds);
+  }
+}
+
+void test_syscall_getpid(test_t *test_params)
+
+{
+  int num_rounds = test_params->num_rounds;
+  int num_iters = test_params->num_iters;
+  int verbose = test_params->verbose;
+  FILE *data_fp = test_params->data_fp;
+  int test_num = test_params->test_num;
+  int cpu_freq = test_params->cpu_freq;
+
+  int rnd, i;
+  uint64_t start, end;
+  uint64_t mycycles;
+  uint64_t mytime;
+  uint64_t total_time = 0;
+  uint64_t total_cycles = 0;
+
+  for (rnd = 0; rnd < num_rounds; rnd++) {
+    // Measure time it takes to write to dev null
+
+	if (test_params->sleep) {
+	  sleep(1);
+	}
+
+	if (test_params->warmup) {
+		getpid();
+		getpid();
+	}	
+
+	start = rdtsc();
+	for (i = 0; i < num_iters; i++) {
+	  getpid();
+	}
+	end = rdtsc();
+
+	mycycles = (end - start) / num_iters;
+	total_cycles += mycycles;
+
+	mytime = convert_cycles_to_ns(cpu_freq, mycycles);
+	total_time += mytime;
+
+	if (verbose) {
+	  printf("Iter %d cycles%llu time %llu ns\n", rnd, mycycles, mytime);
+	}
+	fprintf(data_fp, "%llu %llu\n", mycycles, mytime);
+  }
+
+  printf("Test %d total_cyles %llu total_time %llu avg_cycles %llu avg_time %llu\n", test_num, total_cycles, total_time, (total_cycles / num_rounds), (total_time / num_rounds));
+
+}
+
+void test_syscall_devnull(test_t *test_params)
 {
   int num_rounds = test_params->num_rounds;
   int num_iters = test_params->num_iters;
@@ -140,7 +344,7 @@ void test_syscall_time(test_t *test_params)
 	fprintf(data_fp, "%llu %llu\n", mycycles, mytime);
   }
 
-  printf("Test %d total_cyles %llu total_time %llu avg_cycles %llu avg_time %llu\n", test_num, total_cycles, total_time, (total_cycles / num_iters), (total_time / num_iters));
+  printf("Test %d total_cyles %llu total_time %llu avg_cycles %llu avg_time %llu\n", test_num, total_cycles, total_time, (total_cycles / num_rounds), (total_time / num_rounds));
 
   close(fid);
 }
@@ -257,13 +461,25 @@ int main(int argc, char **argv)
 
   switch(test_params.test_num) {
 
+	case 0:
+	  test_syscall_getpid(&test_params);
+	break;
+
 	case 1:
-	  test_syscall_time(&test_params);
+	  test_syscall_devnull(&test_params);
 	break;
 
 	case 2:
 	  test_creation_time(&test_params);
 	break;
+
+	case 3:
+	  test_ctx_switch(&test_params);
+ 	break;
+	
+	case 4:
+	  test_kthreads(&test_params);
+ 	break;
 
 	default:
 	break;
