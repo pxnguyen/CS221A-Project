@@ -34,18 +34,6 @@ void measure_random(int N){
         printf("Measuring random: %f\n", (c-a)/(double)N);
 }
 
-void measure_forloop_overhead(int N){
-	unsigned long long a,b,c;
-	int i;
-	int index = 0;
-	a = rdtsc();
-	for(i = 0; i < N; i++){
-		index++;
-	}
-	c = rdtsc();
-	printf("With for loop: %f\n", (c-a)/(double)N);
-}
-
 void foo(){
 	int x = 1+1;
 	int y = x;
@@ -86,8 +74,44 @@ void foo7(int a1,int a2, int a3, int a4, int a5, int a6, int a7){
         int y = x;
 }
 
+void measure_for_loop(){
+	unsigned long long a,b,c;
+	a = rdtsc();
+	int i;
+	a = rdtsc();
+	for(i=0; i < 50; i++){
+		foo();
+	}
+	c = rdtsc();
+	printf("With for loop: %f\n", (c-a)/(double)50);
+}
 
+void measure_no_for_loop(){
+	unsigned long long a,b,c;
+	a = rdtsc();
+	foo();foo();foo();foo();foo();
+	foo();foo();foo();foo();foo();
+	foo();foo();foo();foo();foo();
+	foo();foo();foo();foo();foo();
+	foo();foo();foo();foo();foo();
+	foo();foo();foo();foo();foo();
+	foo();foo();foo();foo();foo();
+	foo();foo();foo();foo();foo();
+	foo();foo();foo();foo();foo();
+	foo();foo();foo();foo();foo();
+	
+	c = rdtsc();
+	printf("Without for loop: %f\n", (c-a)/(double)50);
+}
 
+void measure_forloop_overhead(int N){
+	int i = 0;
+	while(i < 10){
+		measure_for_loop();
+		measure_no_for_loop();
+		i++;
+	}
+}
 
 void measure_procedure_call(int N){
 	unsigned long long a,b,c;
