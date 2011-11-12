@@ -84,11 +84,33 @@ Page Fault Service Time :
 \end_layout
 
 \begin_layout Description
-a) Prediction :-
+a) Prediction :- To estimate page fault service time we wanted to measure
+ raw time of reading a page from disk.
+ This is hard to do from user space - but we can measure tiem to read a
+ file without using page cache.
+ This would still include an overhead of copying data between buffers -
+ so while making an estimate we should note that this estimate at best would
+ be upper bound on page fault service time.
+ 
+\end_layout
+
+\begin_layout Itemize
+We measure the time to do a disk read by measuring cost of doing a direct
+ read using 'dd' and redirecting output to /dev/null
+\end_layout
+
+\begin_layout Itemize
+We notice that this gives us a speed of 5.1 MB/s -> Note that this is a gross
+ underestimate - it includes time to copy data between buffers
+\end_layout
+
+\begin_layout Itemize
+Based on the clock speed and bandwidth and page size - we estimate that
+ around 2.1 million cycles will be needed
 \end_layout
 
 \begin_layout Description
-b) Expermiment :- Our aim is to measure the page fault service time.
+b) Experiment :- Our aim is to measure the page fault service time.
  This means we want to measure the time it takes to do a major page fault.
  This includes the time needed to bring the page from the disk.
  We use an mmap (followed by no read aheads) to measure the same.
@@ -102,6 +124,11 @@ Create a Large File ( > 1.5 G) using a simple dd tool
 \end_layout
 
 \begin_layout Itemize
+Determine page size by calling 'getconf PAGESIZE' - This gives us page size
+ of 4096 bytes or 4K on our system
+\end_layout
+
+\begin_layout Itemize
 Call a posix_fadvise with flag FADVISE_DONTNEED.
  We do this to make sure that a page is always brought in from the disk
  and not cached.
@@ -110,7 +137,188 @@ Call a posix_fadvise with flag FADVISE_DONTNEED.
 \end_layout
 
 \begin_layout Itemize
+Memory Map the file using 'mmap' system call with flags 'MAP_PRIVATE'.
+ We do this as we just want to do a read on the file.
+\end_layout
 
+\begin_layout Itemize
+Do a madvise on the memory mapped area using MADV_RANDOM.
+ Do tests both with and without MADV_RANDOM
+\end_layout
+
+\begin_layout Itemize
+Start timer
+\end_layout
+
+\begin_layout Itemize
+Access a random page by reading a page address.
+ This will cause a major page fault.
+\end_layout
+
+\begin_layout Itemize
+End timer.
+ Report the time between start and end of timer.
+\end_layout
+
+\begin_layout Description
+c) Results : The table below shows results for reading one page (4096) .
+ Column 1 and 2 show results without madvise and Columns 3 and 4 show results
+ with madvise
+\end_layout
+
+\begin_layout Description
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Avg.
+ CPU Cycles
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Std.
+ Deviation(CPU Cycles)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Time
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Page Fault (w/o) madvise
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+58,578
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.7625%
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+21ms
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Page Fault (with) madvise
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+197,190
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.1898%
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+73 ms
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+d) Analysis :-
+\end_layout
+
+\begin_layout Itemize
+Our estimate was 2.1 Million CPU Cycles and what we got was 0.2 Million cycles.
+ As explained above, our estimate had some overhead due to copying of data
+ between buffers.
+ Thus we expected the actual time to be smaller
+\end_layout
+
+\begin_layout Itemize
+Its interesting to note that if we dont give an madvise 'advice' for our
+ memory map region, we get better numbers.
+ But those numbers are most likely incorrect.
+ We think if we dont do madvise, we hit pages in page cache and thus the
+ fault time does not remain as major page fault service rate.
+\end_layout
+
+\begin_layout Itemize
+To conclude, to measure page fault service rate, we need to ensure that
+ the page is brough in by reading from disk
 \end_layout
 
 \end_body

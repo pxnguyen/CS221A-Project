@@ -1,0 +1,102 @@
+%% LyX 2.0.0 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{luainputenc}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\makeatother
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{Performance Report on EC2 Instances for Memory Operations}
+
+
+\author{Vineet Kumar, Phuc Xuan Nguyen}
+
+\maketitle
+
+\section{RAM Access Time}
+
+
+\section{RAM Bandwidth}
+
+
+\section{Page Fault Service Time :}
+\begin{description}
+\item [{a)}] Prediction :- To estimate page fault service time we wanted
+to measure raw time of reading a page from disk. This is hard to do
+from user space - but we can measure tiem to read a file without using
+page cache. This would still include an overhead of copying data between
+buffers - so while making an estimate we should note that this estimate
+at best would be upper bound on page fault service time. \end{description}
+\begin{itemize}
+\item We measure the time to do a disk read by measuring cost of doing a
+direct read using 'dd' and redirecting output to /dev/null
+\item We notice that this gives us a speed of 5.1 MB/s -> Note that this
+is a gross underestimate - it includes time to copy data between buffers
+\item Based on the clock speed and bandwidth and page size - we estimate
+that around 2.1 million cycles will be needed\end{itemize}
+\begin{description}
+\item [{b)}] Experiment :- Our aim is to measure the page fault service
+time. This means we want to measure the time it takes to do a major
+page fault. This includes the time needed to bring the page from the
+disk. We use an mmap (followed by no read aheads) to measure the same.
+This works as mmap does a on demand page fault. Page is faulted in
+only on first access. Below is a detailed description of our experiment
+:\end{description}
+\begin{itemize}
+\item Create a Large File ( > 1.5 G) using a simple dd tool
+\item Determine page size by calling 'getconf PAGESIZE' - This gives us
+page size of 4096 bytes or 4K on our system
+\item Call a posix\_fadvise with flag FADVISE\_DONTNEED. We do this to make
+sure that a page is always brought in from the disk and not cached.
+This is equivalent of dropping the page cache (by calling echo 1 >
+/proc/sys/vm/drop\_cache) 
+\item Memory Map the file using 'mmap' system call with flags 'MAP\_PRIVATE'.
+We do this as we just want to do a read on the file.
+\item Do a madvise on the memory mapped area using MADV\_RANDOM. Do tests
+both with and without MADV\_RANDOM
+\item Start timer
+\item Access a random page by reading a page address. This will cause a
+major page fault.
+\item End timer. Report the time between start and end of timer.\end{itemize}
+\begin{description}
+\item [{c)}] Results : The table below shows results for reading one page
+(4096) . Column 1 and 2 show results without madvise and Columns 3
+and 4 show results with madvise
+\item [{%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & Avg. CPU Cycles & Std. Deviation(CPU Cycles) & Time\tabularnewline
+\hline 
+\hline 
+Page Fault (w/o) madvise & 58,578 & 0.7625\% & 21ms\tabularnewline
+\hline 
+Page Fault (with) madvise & 197,190 & 0.1898\% & 73 ms\tabularnewline
+\hline 
+\end{tabular}}]~
+\item [{d)}] Analysis :-\end{description}
+\begin{itemize}
+\item Our estimate was 2.1 Million CPU Cycles and what we got was 0.2 Million
+cycles. As explained above, our estimate had some overhead due to
+copying of data between buffers. Thus we expected the actual time
+to be smaller
+\item Its interesting to note that if we dont give an madvise 'advice' for
+our memory map region, we get better numbers. But those numbers are
+most likely incorrect. We think if we dont do madvise, we hit pages
+in page cache and thus the fault time does not remain as major page
+fault service rate.
+\item To conclude, to measure page fault service rate, we need to ensure
+that the page is brough in by reading from disk\end{itemize}
+
+\end{document}
