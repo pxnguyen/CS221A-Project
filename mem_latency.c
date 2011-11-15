@@ -18,8 +18,8 @@ unsigned long long measure_latency(int size){
 
 int main(int argc, char* argv[]){
 	int i;
-	for(i=1; i<1000; i++){
-		int size = 128*i;
+	for(i=1; i<2000; i++){
+		int size = 1000*i;
 		unsigned long long time = measure_latency(size);
 		printf("%d,%llu\n", size, time);
 	}
