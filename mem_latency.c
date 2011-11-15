@@ -20,8 +20,11 @@ unsigned long long measure_latency(int size){
 
 int main(int argc, char* argv[]){
 	int i;
-	for(i=1; i<10000; i++){
-		int size = 128*i;
+	int **a = (int*) malloc(sizeof(int*)*2000*128);
+	free(a);
+	
+	for(i=1; i<4000; i++){
+		int size = 200*i;
 		unsigned long long time = measure_latency(size);
 		printf("%d,%llu\n", size, time);
 	}
