@@ -79,6 +79,265 @@ RAM Access Time
 RAM Bandwidth
 \end_layout
 
+\begin_layout Description
+a) Prediction - To Predict RAM Bandwidth we need to multiply the memory
+ bus size with the memory clock speed.
+ Our bus size is 64 bits which is 8 bytes.
+ And our memory clock speed is 800 MhZ - which gives us a maximum theoretical
+ transfer rate of 6.4 GB /s.
+ We predict that the write bandwidth would be less than this as it needs
+ to handle issue of page cache eviction
+\end_layout
+
+\begin_layout Description
+b) Experiment for Read Bandwidth : 
+\end_layout
+
+\begin_layout Itemize
+We create a large array in the memory
+\end_layout
+
+\begin_layout Itemize
+In a tight unrolled for loop - we access array elements at interval of L2
+ cache size and add them up.
+ Since our loop is unrolled 4 times, this operation should cause 8 memory
+ read operations from DRAM to L2
+\end_layout
+
+\begin_layout Itemize
+We measure beforehand amount of data transfered between DRAM and L2 for
+ accessing 4 bytes.
+ We found this to be 4K.
+\end_layout
+
+\begin_layout Itemize
+We stop the timer that was started before 8 memory read opertaions.
+ We would have read 32K in one loop iteration.
+ We divide this by time taken and get the memory bandwidth
+\end_layout
+
+\begin_layout Description
+c) Experiment for Write Bandwidth :
+\end_layout
+
+\begin_layout Itemize
+We create a large array in the memory
+\end_layout
+
+\begin_layout Itemize
+In a tight unrolled for loop - We add 2 fixed integers and store the result
+ at an interval of L2 size in our array
+\end_layout
+
+\begin_layout Itemize
+We stop the timer that was started before 8 memory write operations
+\end_layout
+
+\begin_layout Description
+d) Block Transfer:
+\end_layout
+
+\begin_layout Itemize
+We do a L2 size block transfer from one memory location to another in a
+ loop.
+ We measure time it takes to do the transfer
+\end_layout
+
+\begin_layout Itemize
+This transfer will involve one read and possibly 2 write operations.
+ Thus we expect the bandwidth seen by this operation as average of read
+ and write bandwidth 
+\end_layout
+
+\begin_layout Description
+e) Results:
+\end_layout
+
+\begin_layout Description
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+CPU Cycles
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Std.
+ Deviation
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Bandwidth GB /s
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Read
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+41,518
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.05 %
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.076
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Write
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+98, 781
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.03%
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.878
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Block Transfer
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+49,223,872
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.023%
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.279
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Description
+f) Analysis:
+\end_layout
+
+\begin_layout Itemize
+Block tarnsfer test results macth up with what we expected.
+ We expected the bandwidth to be average of read and write bandwidth numbers
+\end_layout
+
+\begin_layout Itemize
+However, out orginal estimation seems to be off by quite a lot.
+ We expected to see a bandwidth of 6GB /s and saw 2 GB / s - We can attribute
+ it to the fact that we are running it on top of hypervisor and thus page
+ fault time could take more time as PTEs need to be installed in the hypervisor'
+s shadow page tables.
+\end_layout
+
 \begin_layout Section
 Page Fault Service Time :
 \end_layout

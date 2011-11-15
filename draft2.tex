@@ -2,7 +2,7 @@
 %% Do not edit unless you really know what you are doing.
 \documentclass[english]{article}
 \usepackage[T1]{fontenc}
-\usepackage[utf8]{luainputenc}
+\usepackage[latin9]{inputenc}
 
 \makeatletter
 
@@ -29,7 +29,65 @@
 
 
 \section{RAM Bandwidth}
-
+\begin{description}
+\item [{a)}] Prediction - To Predict RAM Bandwidth we need to multiply
+the memory bus size with the memory clock speed. Our bus size is 64
+bits which is 8 bytes. And our memory clock speed is 800 MhZ - which
+gives us a maximum theoretical transfer rate of 6.4 GB /s. We predict
+that the write bandwidth would be less than this as it needs to handle
+issue of page cache eviction
+\item [{b)}] Experiment for Read Bandwidth : \end{description}
+\begin{itemize}
+\item We create a large array in the memory
+\item In a tight unrolled for loop - we access array elements at interval
+of L2 cache size and add them up. Since our loop is unrolled 4 times,
+this operation should cause 8 memory read operations from DRAM to
+L2
+\item We measure beforehand amount of data transfered between DRAM and L2
+for accessing 4 bytes. We found this to be 4K.
+\item We stop the timer that was started before 8 memory read opertaions.
+We would have read 32K in one loop iteration. We divide this by time
+taken and get the memory bandwidth\end{itemize}
+\begin{description}
+\item [{c)}] Experiment for Write Bandwidth :\end{description}
+\begin{itemize}
+\item We create a large array in the memory
+\item In a tight unrolled for loop - We add 2 fixed integers and store the
+result at an interval of L2 size in our array
+\item We stop the timer that was started before 8 memory write operations\end{itemize}
+\begin{description}
+\item [{d)}] Block Transfer:\end{description}
+\begin{itemize}
+\item We do a L2 size block transfer from one memory location to another
+in a loop. We measure time it takes to do the transfer
+\item This transfer will involve one read and possibly 2 write operations.
+Thus we expect the bandwidth seen by this operation as average of
+read and write bandwidth \end{itemize}
+\begin{description}
+\item [{e)}] Results:
+\item [{%
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ & CPU Cycles & Std. Deviation & Bandwidth GB /s\tabularnewline
+\hline 
+\hline 
+Read & 41,518 & 0.05 \% & 2.076\tabularnewline
+\hline 
+Write & 98, 781 & 0.03\% & 0.878\tabularnewline
+\hline 
+Block Transfer & 49,223,872 & 0.023\% & 1.279\tabularnewline
+\hline 
+\end{tabular}}]~
+\item [{f)}] Analysis:\end{description}
+\begin{itemize}
+\item Block tarnsfer test results macth up with what we expected. We expected
+the bandwidth to be average of read and write bandwidth numbers
+\item However, out orginal estimation seems to be off by quite a lot. We
+expected to see a bandwidth of 6GB /s and saw 2 GB / s - We can attribute
+it to the fact that we are running it on top of hypervisor and thus
+page fault time could take more time as PTEs need to be installed
+in the hypervisor's shadow page tables.
+\end{itemize}
 
 \section{Page Fault Service Time :}
 \begin{description}
