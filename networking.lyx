@@ -1,0 +1,677 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass AGU-article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Networking
+\end_layout
+
+\begin_layout Standard
+In this section, we will discuss the experimentation design and results
+ for measuring the round trip time, network bandwidth, connection setup,
+ and connection teardown.
+ We will compare these values with the loopback device time, which we assumes
+ that the bandwidth is approximately the same as the width of the memory
+ bus.
+\end_layout
+
+\begin_layout Standard
+In all experiment, we will have a server and client that interact with each
+ other.
+ We use two identical EC2 instances to setup a server and a client.
+ In the loopback case, we just use one regular EC2 t1.micro instance.
+\end_layout
+
+\begin_layout Subsection
+Round trip time
+\end_layout
+
+\begin_layout Standard
+Round trip time is defined as the transmission times between two points
+ of a signal.
+ More specifically, it is defined as the time it takes for a packet to be
+ sent plus the time for the response to come back.
+\end_layout
+
+\begin_layout Subsubsection
+Experiment setup
+\end_layout
+
+\begin_layout Standard
+In the effort to compare the result with the ping time, we make sure that
+ we are the same amount of bytes.
+ In Unix's ping, the default option is 84 bytes per ping.
+ We know that the TCP header is 20 bytes, we will pad 64 bytes on to the
+ data, to create the same amount.
+\end_layout
+
+\begin_layout Standard
+We set up two identical instances: one server and one client.
+ Client will boot up, acquire the connection with the server, and then send
+ him a 64 bytes message (84 bytes with TCP headers).
+ Server will process the message, copy it into its buffer and send it back
+ to the client.
+ Client receives the messages, record statistics, and quit.
+\end_layout
+
+\begin_layout Subsubsection
+Prediction
+\end_layout
+
+\begin_layout Standard
+To get an idea of the RTT time between the two EC2 instances, we ping the
+ server instance.
+ Results from pinging yields the average of .444ms.
+ We predict that our experimental result will be less than the estimate
+ due to the fact that ICMP is handled in the kernel and TCP needs to cross
+ the protection boundary.
+ In the CPU scheduling part, we reported that the cost of the syscall is
+ around
+\end_layout
+
+\begin_layout Subsubsection
+Experimentation Results
+\end_layout
+
+\begin_layout Standard
+After 1000 data points, we come to the following statitics.
+ Table 1 describes the round trip remote statistics.
+ Table 2 describes the round trip loopback statistics.
+\end_layout
+
+\begin_layout Standard
+The following results obtained by the following command in Unix: 
+\series bold
+ping -c 100 10.211.45.127
+\end_layout
+
+\begin_layout Standard
+--- 10.211.45.127 ping statistics ---
+\end_layout
+
+\begin_layout Standard
+100 packets transmitted, 100 received, 0% packet loss, time 98998ms
+\end_layout
+
+\begin_layout Standard
+rtt min/avg/max/mdev = 0.356/0.590/11.939/1.154 ms
+\end_layout
+
+\begin_layout Standard
+The following results obtained by the following command in Unix: 
+\series bold
+ping localhost
+\end_layout
+
+\begin_layout Standard
+--- localhost.localdomain ping statistics ---
+\end_layout
+
+\begin_layout Standard
+723 packets transmitted, 723 received, 0% packet loss, time 722009ms
+\end_layout
+
+\begin_layout Standard
+rtt min/avg/max/mdev = 0.020/0.033/0.094/0.005 ms
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+min
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+average
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+std
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+clock cycles
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1867624
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2417024
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2066900
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+122720
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+time(ms)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.718 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.9296
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.79 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.0472
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Round trip remote statistics
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+min
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+average
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+std
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+clock cycles
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+738360
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+982656
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+793550
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+56771
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+time(ms)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.2839
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.377
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.31
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.0218
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Round trip loopback device
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Discussion
+\end_layout
+
+\begin_layout Standard
+The ping statistics for both remote and loopback device is better than the
+ round trip time.
+ As mentioned, in our prediction, this could mainly caused by the fact that
+ ICMP is handled through the kernel and TCP is handled in the user address
+ space.
+ The cost of context switching and crossing address space adds up to the
+ difference.
+\end_layout
+
+\begin_layout Standard
+We also notice that ping time is an order of magnitude better than round
+ trip loopback device time.
+ We attribute this fact to the possibility that the ping call wouldn't leave
+ the kernel space for the localhost to copy the package data to the network
+ card.
+ As opposed to the round trip, first we have to call send, which involves
+ in a switch to the kernel space.
+ The data is then copied to the network card, and triggers an interrupts
+ to the user space.
+\end_layout
+
+\begin_layout Standard
+The RTT time for the loopback device could be considered as the OS software
+ overhead, as packet is directly copied into the network card.
+ The baseline network performance would be the difference between the loopback
+ device RTT and the remote RTT.
+ According to this logic, the ideal RTT without the OS overhead would be
+ (0.79-0.31) = .48ms.
+\end_layout
+
+\begin_layout Subsection
+Peak Bandwidth
+\end_layout
+
+\begin_layout Subsubsection
+Experiment Setup
+\end_layout
+
+\begin_layout Standard
+We set up two identical instances: a server and a client.
+ The client will connect to the target server, and sending various amount
+ of data to the servers.
+ The amount ranges from 1MB to 400MB.
+\end_layout
+
+\begin_layout Standard
+Unlike the previous experiment, we are measuring the performance on the
+ server side.
+ Server will wait for a connection and starts reading from the the socket.
+ After each read, it will record the running total of bytes reading so far.
+\end_layout
+
+\begin_layout Standard
+To eliminate the potential overhead on 
+\end_layout
+
+\begin_layout Standard
+To get an idea of the data transfer rate between two instances, we perform
+ a quick scp command between two instances to transfer a 1GB files.
+ We notice the TCP connection starts off with the data transfer rate of
+ 30MB/s.
+ However, it quickly degrade to around 10MB/s.
+\end_layout
+
+\begin_layout Subsection
+Connection Setup and Teardown
+\end_layout
+
+\begin_layout Standard
+To set up a connection, TCP uses the three-way handshake:
+\end_layout
+
+\begin_layout Enumerate
+The client sends the SYN to the server
+\end_layout
+
+\begin_layout Enumerate
+Server responds with SYN-ACK.
+\end_layout
+
+\begin_layout Enumerate
+Client responds with ACK.
+\end_layout
+
+\begin_layout Standard
+To tear down a connection, 
+\end_layout
+
+\begin_layout Subsubsection
+Experiment Setup
+\end_layout
+
+\begin_layout Standard
+This experiment setup is similar the setup in measuring the round trip time.
+ We have two identical instances: server and client.
+ We measure the two calls, 
+\begin_inset Quotes eld
+\end_inset
+
+connect()
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+close()
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Clients try to call connect to the server's IP.
+ Once it gets the connections, it records the statistics.
+ Then, it calls close() on the file descriptor, records the statistics for
+ tearing down a connection and quit.
+\end_layout
+
+\begin_layout Standard
+We run this experiment 1000 times.
+\end_layout
+
+\begin_layout Subsubsection
+Prediction
+\end_layout
+
+\begin_layout Subsubsection
+Experiment Result
+\end_layout
+
+\begin_layout Subsubsection
+Discussion
+\end_layout
+
+\end_body
+\end_document

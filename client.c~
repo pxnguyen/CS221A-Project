@@ -76,17 +76,16 @@ int main(int argc, char *argv[])
     }
     
     freeaddrinfo(servinfo); // all done with this structure
-	
-    start = rdtsc();
+    
     if (send(sockfd, message, 64, 0) == -1)
 	    perror("send");
     
+    start = rdtsc();
     if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
       perror("recv");
       exit(1);
     }
     end = rdtsc();
-    printf("%llu,", end-start);
 
     start = rdtsc();
     close(sockfd);

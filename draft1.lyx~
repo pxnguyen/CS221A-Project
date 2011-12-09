@@ -1,0 +1,887 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\makeatother
+\end_preamble
+\use_default_options false
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Performance Report on EC2 Instances
+\end_layout
+
+\begin_layout Author
+Vineet Kumar, Phuc Xuan Nguyen
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Amazon Elastic Compute Cloud(EC2) is a web service that provides resizable
+ computing power through the cloud.
+ There are lots of disputes online regarding the correctness of the 
+\begin_inset Quotes eld
+\end_inset
+
+rated
+\begin_inset Quotes erd
+\end_inset
+
+ hardware performance of Amazon EC2.
+ Some articles claims that the actual performance of the hardware is much
+ less than the advertised number.
+ We are interested in testing to see whether such claim is accurate, and
+ if not, what the reason might be.
+ As a later part of the project, we are also interested in the overhead
+ of the linux containers(LXC) on a virtualized platform.
+ 
+\end_layout
+
+\begin_layout Standard
+The aim of this project is to measure performance on Amazon's EC2 instances.
+ For the first portion of this project we measure the overhead of CPU, schedulin
+g and OS services.
+ All the code for our tests was written in C.
+ We used gcc 4.6.1 with no optimizations to run our code.
+ Collecting machine description information, measuring procedure call overhead
+ and measurment overhead were done by Phuc Xuan Nguyen.
+ Measurement of system call overhead, process creation, kernel thread creation,
+ process context switch and kernel context switch were done by Vineet Kumar.
+ We think we spent in total of around 7 working days for this portion of
+ the project.
+\end_layout
+
+\begin_layout Section
+Machine Description
+\end_layout
+
+\begin_layout Standard
+We are aiming to measure the performance on the Amazon's t1.micro instances.
+ 
+\end_layout
+
+\begin_layout Itemize
+1 Elastic Computing Unit 
+\end_layout
+
+\begin_layout Itemize
+Processor: Intel(c) Xeon(R) CPU E5430 @ 2.66Ghz.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+12M L2 Cache, 1333 Mhz FSB 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Memory: 592MiB 
+\end_layout
+
+\begin_layout Itemize
+Netword card speed
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Between EC2 Instances: 100MB/s 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Disk: Amazon Elastic Block (EBS)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Size: 7.9GB 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Operating System: Ubuntu Oneric 11.10 
+\end_layout
+
+\begin_layout Section
+CPU Operation
+\end_layout
+
+\begin_layout Standard
+For all our experiments we use RDTSC counter.
+ To obtain time we divide this by the CPU frequency.
+ Also of all the data seen, we discard the best and worst 10% of data and
+ then take mean values.
+\end_layout
+
+\begin_layout Subsection
+Measurement overhead
+\end_layout
+
+\begin_layout Subsubsection
+Experiment
+\end_layout
+
+\begin_layout Standard
+We are using RDTSC as a fine-grained counter to measure the performance.
+ In order to calculate the overhead of RDSTC, we run the following experiment.
+\end_layout
+
+\begin_layout Standard
+Function 1: 
+\end_layout
+
+\begin_layout Itemize
+Get initial clock counter 
+\end_layout
+
+\begin_layout Itemize
+Repeat N times:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Run RDTSC 
+\end_layout
+
+\begin_layout Itemize
+Perform a random function f 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Return the difference between the current and the initial clock counter.
+ 
+\end_layout
+
+\begin_layout Standard
+Function 2: 
+\end_layout
+
+\begin_layout Itemize
+Get initial clock counter 
+\end_layout
+
+\begin_layout Itemize
+Repeat N times:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Perform a random function f 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Return the difference between the current and the initial clock counter
+\end_layout
+
+\begin_layout Standard
+To measure the for loop overhead, we set up two procedures: (1) using a
+ for loop to execute a function foo() 50 times, and (2) just execute foo()
+ 50 times in a row.
+ Through experiment we find that the amount of times does not affect the
+ interested results.
+\end_layout
+
+\begin_layout Subsubsection
+Results
+\end_layout
+
+\begin_layout Standard
+We find that the variance becomes insignificant when N is around 10000.
+ We avoid the possible compiler optimization by running the random function
+ f.
+\end_layout
+
+\begin_layout Standard
+We calculate the difference in the result of Function 2 and Function 1 and
+ divide that by N to find the overhead of RDTSC.
+ In the t1.micro instance.
+\end_layout
+
+\begin_layout Itemize
+Without RDTSC: average 6.00 cycles ~ 2.25 
+\begin_inset Formula $\mu s$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+With RDTSC: average 48 cycles ~ 18.04 
+\begin_inset Formula $\mu s$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+The overhead of RDSTC: ~ 15.789
+\begin_inset Formula $\mu s$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+After running the for-loop experiment 10000 times, we find that
+\end_layout
+
+\begin_layout Standard
+1.
+ Without for loop: average 12.6 cycles ~ 
+\begin_inset Formula $4.7\mu s$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+2.
+ With for loop: average 21.8 cycles ~ 
+\begin_inset Formula $7.89\mu s$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So the overhead of the for loop is the difference between these, which is
+ around 9.2 cycles ~ 
+\begin_inset Formula $3.38\mu s$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Procedure call overhead
+\end_layout
+
+\begin_layout Standard
+To find out the procedure call overhead, we perform two simple operations
+ (int x = 1+1; int y = x;) in 9 different scenarios: no procedure call and
+ procedure calls with the 0-7 parameters.
+ Figure ? describes the increment in overhead.
+\end_layout
+
+\begin_layout Standard
+The result, gathered after running 1,000,000 iterations, is shown in Figure
+ 1.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename procedure_call_result.png
+	scale 50
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Clock cycle(param)* -1 means no procedure call
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+System call overhead
+\end_layout
+
+\begin_layout Standard
+To measure system call overhead, we need to do measurements on a system
+ call that does not do much work.
+ We do our experiments by calling 
+\begin_inset Quotes eld
+\end_inset
+
+getpid()
+\begin_inset Quotes erd
+\end_inset
+
+ and by writing one byte to the device devnull.
+ We notice that for both these experiments if we run a tight loop within
+ a single process, the system call gets cached and thus does not give us
+ correct overhead measurements.
+ Thus, we handle this issue by running the test within a context of different
+ process.
+ We run the test for 10,000 iterations.
+ Table 1 shows the results:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+Table 1: System call overhead
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+System Call 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Time - cached(
+\begin_inset Formula $\mu$
+\end_inset
+
+s) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Std.
+ dev- cached 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Time - uncached(
+\begin_inset Formula $\mu$
+\end_inset
+
+s) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Std.
+ dev - uncached
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+getpid() 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.00358 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.71
+\begin_inset Formula $\%$
+\end_inset
+
+ 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+7.89 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+5.74%
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+write to devnull 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.00341 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.06% 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.45 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+53%
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Task creation time
+\end_layout
+
+\begin_layout Standard
+We measure the task creation time by calling the timer before a fork() is
+ issued and immediately inside the child process.
+ We repeat this process for 10, 000 iterations.
+ To measure the creation time for a kernel thread - we use posix thread
+ attributes to tie a user thread to a kernel level thread.
+ We repeat these experiments 10,000 times.
+ We use the following test methodology : 
+\end_layout
+
+\begin_layout Enumerate
+Repeat N times 
+\end_layout
+
+\begin_layout Enumerate
+Start timer 
+\end_layout
+
+\begin_layout Enumerate
+Fork a process 
+\end_layout
+
+\begin_layout Enumerate
+Stop timer inside the child process 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+Table 2: Process and kernel thread creation overhead
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Time(
+\begin_inset Formula $\mu$
+\end_inset
+
+s) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Std.
+ deviation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Process creation 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+264.73 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+18.48%
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Kernel Thread Creation 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.89 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+35 
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Context switching time
+\end_layout
+
+\begin_layout Standard
+We measure context switch time by passing a token across pipes.
+ We create a total of 4 pipes to accomplish a 2 way communication and measure
+ the round trip time.
+ This roundtrip time per process contains time needed to conext switch twice
+ and time for a read and write call using pipes.
+ We however, do not remove the pipe overhead - that needs to be done.
+ We run our experiments for N iterations
+\end_layout
+
+\begin_layout Standard
+This is the test methodology we use for measuring a process context switch
+ time 
+\end_layout
+
+\begin_layout Enumerate
+Create 2 pipes for communication between process 1 and process 2 (pipe1)
+ 
+\end_layout
+
+\begin_layout Enumerate
+Create 2 pipes for communication between process 2 and process 1 (pipe2)
+ 
+\end_layout
+
+\begin_layout Enumerate
+Repeat N times
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Start timer 
+\end_layout
+
+\begin_layout Enumerate
+Repeat (c) -(d) for some iterations 
+\end_layout
+
+\begin_layout Enumerate
+Process 1 writes to pipe1, process 2 reads it.
+ Note that these will be blocking reads.
+ This causes Process 2 to start running 
+\end_layout
+
+\begin_layout Enumerate
+Process 2 writes to pipe2 and process 1 reads it.
+ This will again cause a context switch 
+\end_layout
+
+\begin_layout Enumerate
+Stop timer 
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+For Measuring kernel thread context switch time we use posix threads bound
+ to kernel by setting scope attribute to PTHREAD_SCOPE_SYSTEM 
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+Table 3: Context Switching overhead
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="3">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Time (
+\begin_inset Formula $\mu$
+\end_inset
+
+s) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Std.
+ deviation
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Process Context Switch 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.19 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+27.8%
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Kernel thread context switch 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2.65 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+38.5%
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

@@ -2781,14 +2781,7 @@ For the connection teardown time, we notice the number is an order of magnitude
 \end_layout
 
 \begin_layout Standard
-Similar to before, we can use the loopback statistics to be the OS overhead.
- So the baseline network connection establishment performance is 0.48024-0.3159
- = 0.16434.
- In our experiment, we couldn't establish the baseline performance of the
- network regarding the tearing down of a connection due to the fact that
- the close all returns immediately.
- As the number suggests, the close call in the remote case and the loopback
- case yields very similar statistics.
+Similar to before, we can use the loopback statistics to be the 
 \end_layout
 
 \begin_layout Section

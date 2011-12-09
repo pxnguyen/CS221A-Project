@@ -34,6 +34,9 @@ int main(int argc, char *argv[])
     char s[INET6_ADDRSTRLEN];
     char * message = "abcdefghijklmnoprstuvwyzabcdefghijklmnoprstuvwyzabcdefghijklmnoprst"; // 64 bytes
     unsigned long long start, end;
+    struct linger linger;
+    linger.l_onoff = 1;
+    linger.l_linger = 5;
 
     if (argc != 2) {
         fprintf(stderr,"usage: client hostname\n");
@@ -49,7 +52,6 @@ int main(int argc, char *argv[])
         return 1;
     }
     
-    start = rdtsc();
     // loop through all the results and connect to the first we can
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
@@ -57,16 +59,17 @@ int main(int argc, char *argv[])
             perror("client: socket");
             continue;
         }
-
+	
+	start = rdtsc();
         if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
             perror("client: connect");
             continue;
         }
+        end = rdtsc();
 
         break;
     }
-    end = rdtsc();
     
     printf("%llu,", end-start);
 

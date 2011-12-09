@@ -1,0 +1,832 @@
+#LyX file created by tex2lyx 1.6.7
+\lyxformat 264
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\makeatother
+
+\makeatother
+
+\usepackage{babel}
+\end_preamble
+\language english
+\inputencoding latin9
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\paperfontsize default
+\spacing single
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+
+Performance Report on EC2 Instances for Memory Operations
+\end_layout
+
+\begin_layout Author
+
+Vineet Kumar, Phuc Xuan Nguyen
+\end_layout
+
+\begin_layout Section
+
+RAM Access Time
+\end_layout
+
+\begin_layout Section
+
+RAM Bandwidth
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+a)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Prediction - To Predict RAM Bandwidth we need to multiply the memory bus size with the memory clock speed. Our bus size is 64 bits which is 8 bytes. And our memory clock speed is 800 MhZ - which gives us a maximum theoretical transfer rate of 6.4 GB /s. We predict that the write bandwidth would be less than this as it needs to handle issue of page cache eviction 
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+b)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Experiment for Read Bandwidth : 
+\end_layout
+
+\begin_layout Itemize
+
+We create a large array in the memory 
+\end_layout
+
+\begin_layout Itemize
+
+In a tight unrolled for loop - we access array elements at interval of L2 cache size and add them up. Since our loop is unrolled 4 times, this operation should cause 8 memory read operations from DRAM to L2 
+\end_layout
+
+\begin_layout Itemize
+
+We measure beforehand amount of data transfered between DRAM and L2 for accessing 4 bytes. We found this to be 4K. 
+\end_layout
+
+\begin_layout Itemize
+
+We stop the timer that was started before 8 memory read opertaions. We would have read 32K in one loop iteration. We divide this by time taken and get the memory bandwidth
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+c)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Experiment for Write Bandwidth :
+\end_layout
+
+\begin_layout Itemize
+
+We create a large array in the memory 
+\end_layout
+
+\begin_layout Itemize
+
+In a tight unrolled for loop - We add 2 fixed integers and store the result at an interval of L2 size in our array 
+\end_layout
+
+\begin_layout Itemize
+
+We stop the timer that was started before 8 memory write operations
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+d)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Block Transfer:
+\end_layout
+
+\begin_layout Itemize
+
+We do a L2 size block transfer from one memory location to another in a loop. We measure time it takes to do the transfer 
+\end_layout
+
+\begin_layout Itemize
+
+This transfer will involve one read and possibly 2 write operations. Thus we expect the bandwidth seen by this operation as average of read and write bandwidth 
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+e)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Results: 
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="4" columns="4">
+<features>
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="center" valignment="top" rightline="true">
+<column alignment="center" valignment="top" rightline="true">
+<column alignment="center" valignment="top" rightline="true">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+CPU Cycles 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Std. Deviation 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Bandwidth GB /s
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Read 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+41,518 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.05 % 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2.076
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Write 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+98, 781 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.03% 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.878
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Block Transfer 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+49,223,872 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.023% 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+1.279
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ \InsetSpace ~
+ 
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+f)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Analysis:
+\end_layout
+
+\begin_layout Itemize
+
+Block tarnsfer test results macth up with what we expected. We expected the bandwidth to be average of read and write bandwidth numbers 
+\end_layout
+
+\begin_layout Itemize
+
+However, out orginal estimation seems to be off by quite a lot. We expected to see a bandwidth of 6GB /s and saw 2 GB / s - We can attribute it to the fact that we are running it on top of hypervisor and thus page fault time could take more time as PTEs need to be installed in the hypervisor's shadow page tables. 
+\end_layout
+
+\begin_layout Section
+
+Page Fault Service Time :
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+a)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Prediction :- To estimate page fault service time we wanted to measure raw time of reading a page from disk. This is hard to do from user space - but we can measure tiem to read a file without using page cache. This would still include an overhead of copying data between buffers - so while making an estimate we should note that this estimate at best would be upper bound on page fault service time. 
+\end_layout
+
+\begin_layout Itemize
+
+We measure the time to do a disk read by measuring cost of doing a direct read using 'dd' and redirecting output to /dev/null 
+\end_layout
+
+\begin_layout Itemize
+
+We notice that this gives us a speed of 5.1 MB/s -> Note that this is a gross underestimate - it includes time to copy data between buffers 
+\end_layout
+
+\begin_layout Itemize
+
+Based on the clock speed and bandwidth and page size - we estimate that around 2.1 million cycles will be needed
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+b)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Experiment :- Our aim is to measure the page fault service time. This means we want to measure the time it takes to do a major page fault. This includes the time needed to bring the page from the disk. We use an mmap (followed by no read aheads) to measure the same. This works as mmap does a on demand page fault. Page is faulted in only on first access. Below is a detailed description of our experiment :
+\end_layout
+
+\begin_layout Itemize
+
+Create a Large File ( > 1.5 G) using a simple dd tool 
+\end_layout
+
+\begin_layout Itemize
+
+Determine page size by calling 'getconf PAGESIZE' - This gives us page size of 4096 bytes or 4K on our system 
+\end_layout
+
+\begin_layout Itemize
+
+Call a posix_fadvise with flag FADVISE_DONTNEED. We do this to make sure that a page is always brought in from the disk and not cached. This is equivalent of dropping the page cache (by calling echo 1 > /proc/sys/vm/drop_cache) 
+\end_layout
+
+\begin_layout Itemize
+
+Memory Map the file using 'mmap' system call with flags 'MAP_PRIVATE'. We do this as we just want to do a read on the file. 
+\end_layout
+
+\begin_layout Itemize
+
+Do a madvise on the memory mapped area using MADV_RANDOM. Do tests both with and without MADV_RANDOM 
+\end_layout
+
+\begin_layout Itemize
+
+Start timer 
+\end_layout
+
+\begin_layout Itemize
+
+Access a random page by reading a page address. This will cause a major page fault. 
+\end_layout
+
+\begin_layout Itemize
+
+End timer. Report the time between start and end of timer.
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+c)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Results : The table below shows results for reading one page (4096) . Column 1 and 2 show results without madvise and Columns 3 and 4 show results with madvise 
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular 
+<lyxtabular version="3" rows="3" columns="4">
+<features>
+<column alignment="center" valignment="top" leftline="true" rightline="true">
+<column alignment="center" valignment="top" rightline="true">
+<column alignment="center" valignment="top" rightline="true">
+<column alignment="center" valignment="top" rightline="true">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Avg. CPU Cycles 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Std. Deviation(CPU Cycles) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Time
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Page Fault (w/o) madvise 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+58,578 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.7625% 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+21ms
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Page Fault (with) madvise 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+197,190 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.1898% 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+73 ms
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ \InsetSpace ~
+ 
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+d)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Analysis :-
+\end_layout
+
+\begin_layout Itemize
+
+Our estimate was 2.1 Million CPU Cycles and what we got was 0.2 Million cycles. As explained above, our estimate had some overhead due to copying of data between buffers. Thus we expected the actual time to be smaller 
+\end_layout
+
+\begin_layout Itemize
+
+Its interesting to note that if we dont give an madvise 'advice' for our memory map region, we get better numbers. But those numbers are most likely incorrect. We think if we dont do madvise, we hit pages in page cache and thus the fault time does not remain as major page fault service rate. 
+\end_layout
+
+\begin_layout Itemize
+
+To conclude, to measure page fault service rate, we need to ensure that the page is brough in by reading from disk
+\end_layout
+
+\end_body
+\end_document
