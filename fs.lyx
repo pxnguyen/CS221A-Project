@@ -1512,5 +1512,49 @@ Graph shows that as number of processes increase the variations in reading
  on sam disk, seek time should vary a lot, seems correct
 \end_layout
 
+\begin_layout Bibliography
+\labelwidthstring References
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-2"
+
+\end_inset
+
+Larry McVoy and Carl Staelin, lmbench: Portable Tools for Performance Analysis,
+ Proc.
+ of USENIX Annual Technical Conference, January 1996.
+\end_layout
+
+\begin_layout Bibliography
+\labelwidthstring References
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-3"
+
+\end_inset
+
+Aaron B.
+ Brown and Margo I.
+ Seltzer, Operating system benchmarking in the wake of lmbench: a case study
+ of the performance of NetBSD on the Intel x86 architecture, Proc.
+ of ACM SIGMETRICS, pp.
+ 214-224, June 1997.
+\end_layout
+
+\begin_layout Bibliography
+\labelwidthstring References
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-5"
+
+\end_inset
+
+John K.
+ Ousterhout, Why Aren't Operating Systems Getting Faster as Fast as Hardware?,
+ Proc.
+ of USENIX Summer Conference, pp.
+ 247-256, June 1990.
+\end_layout
+
 \end_body
 \end_document
