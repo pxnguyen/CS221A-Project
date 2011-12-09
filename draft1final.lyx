@@ -485,7 +485,7 @@ getpid()
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00358 ()
+0.00358 (9.66 M cycles)
 \end_layout
 
 \end_inset
@@ -507,7 +507,7 @@ getpid()
 \begin_inset Text
 
 \begin_layout Plain Layout
-7.89 ()
+7.89 (21303 M cycles)
 \end_layout
 
 \end_inset
@@ -536,7 +536,7 @@ write to devnull
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00341 ()
+0.00341 (9.21 M cycles)
 \end_layout
 
 \end_inset
@@ -554,7 +554,7 @@ write to devnull
 \begin_inset Text
 
 \begin_layout Plain Layout
-1.45 ()
+1.45 (3915 M cycles)
 \end_layout
 
 \end_inset
@@ -688,7 +688,7 @@ Process creation
 \begin_inset Text
 
 \begin_layout Plain Layout
-264.73 
+264.73(714771 M cycles) 
 \end_layout
 
 \end_inset
@@ -717,7 +717,7 @@ Kernel Thread Creation
 \begin_inset Text
 
 \begin_layout Plain Layout
-1.89 
+1.89 (5103 M cycles)
 \end_layout
 
 \end_inset
@@ -881,7 +881,7 @@ Process Context Switch
 \begin_inset Text
 
 \begin_layout Plain Layout
-2.19 
+2.19 (5913 M cycles)
 \end_layout
 
 \end_inset
@@ -910,7 +910,7 @@ Kernel thread context switch
 \begin_inset Text
 
 \begin_layout Plain Layout
-2.65 
+2.65 (7155 M cycles)
 \end_layout
 
 \end_inset
