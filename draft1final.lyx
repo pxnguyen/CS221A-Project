@@ -1,5 +1,5 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
-\lyxformat 345
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
 \begin_document
 \begin_header
 \textclass article
@@ -7,18 +7,26 @@
 \makeatother
 \end_preamble
 \use_default_options false
+\maintain_unincluded_children false
 \language english
+\language_package default
 \inputencoding auto
+\fontencoding global
 \font_roman default
 \font_sans default
 \font_typewriter default
 \font_default_family default
+\use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
 
 \graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
 \paperfontsize default
 \spacing single
 \use_hyperref false
@@ -26,20 +34,31 @@
 \use_geometry false
 \use_amsmath 1
 \use_esint 1
+\use_mhchem 1
+\use_mathdots 1
 \cite_engine basic
 \use_bibtopic false
+\use_indices false
 \paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\defskip medskip
+\paragraph_indentation default
 \quotes_language english
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
 \tracking_changes false
 \output_changes false
-\author "" 
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
 \end_header
 
 \begin_body
@@ -342,9 +361,18 @@ Clock cycle(param)* -1 means no procedure call
 System call overhead
 \end_layout
 
-\begin_layout Standard
-To measure system call overhead, we need to do measurements on a system
- call that does not do much work.
+\begin_layout Enumerate
+Prediction - System Call is a slightly heavier call than a simple procedure
+ call, it needs to do more checks and in effect is the only domain crossing
+ for our system.
+ Thus we predict that system call overhead time would be little more than
+ a procedure call.
+ Its hard to make other predictions for a system call.
+\end_layout
+
+\begin_layout Enumerate
+Experiment: To measure system call overhead, we need to do measurements
+ on a system call that does not do much work.
  We do our experiments by calling 
 \begin_inset Quotes eld
 \end_inset
@@ -360,10 +388,14 @@ getpid()
  Thus, we handle this issue by running the test within a context of different
  process.
  We run the test for 10,000 iterations.
- Table 1 shows the results:
+ Table 1 shows the results:Results: The following table shows the results:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Enumerate
+Results :
+\end_layout
+
+\begin_layout Enumerate
 \begin_inset Float table
 wide false
 sideways false
@@ -376,7 +408,7 @@ Table 1: System call overhead
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="5">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -453,7 +485,7 @@ getpid()
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00358 
+0.00358 ()
 \end_layout
 
 \end_inset
@@ -475,7 +507,7 @@ getpid()
 \begin_inset Text
 
 \begin_layout Plain Layout
-7.89 
+7.89 ()
 \end_layout
 
 \end_inset
@@ -504,7 +536,7 @@ write to devnull
 \begin_inset Text
 
 \begin_layout Plain Layout
-0.00341 
+0.00341 ()
 \end_layout
 
 \end_inset
@@ -522,7 +554,7 @@ write to devnull
 \begin_inset Text
 
 \begin_layout Plain Layout
-1.45 
+1.45 ()
 \end_layout
 
 \end_inset
@@ -549,8 +581,20 @@ write to devnull
 
 \end_layout
 
+\begin_layout Enumerate
+Analysis : We see that the time needed for a getpid() is slightly more than
+ a procedure call
+\end_layout
+
 \begin_layout Subsection
 Task creation time
+\end_layout
+
+\begin_layout Standard
+Prediction : We epect task creation to take much more time than a system
+ call, as it involves context switch when a new task needs to created.
+ We expect kernel thread creation to take less time as in effect a user
+ thread is tied to kernel.
 \end_layout
 
 \begin_layout Standard
@@ -592,7 +636,7 @@ Table 2: Process and kernel thread creation overhead
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="3">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -700,8 +744,20 @@ Kernel Thread Creation
 
 \end_layout
 
+\begin_layout Standard
+Analysis : Process creation time takes much longer than kernel thread creation,
+ a part of the explanation could be that process creation needs to do domain
+ crossing, whereas kernel thread creation does not.
+\end_layout
+
 \begin_layout Subsection
 Context switching time
+\end_layout
+
+\begin_layout Standard
+Prediction : We expect context switch time to take atleast the time needed
+ for system call.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -760,7 +816,7 @@ Stop timer
 \end_deeper
 \begin_layout Standard
 For Measuring kernel thread context switch time we use posix threads bound
- to kernel by setting scope attribute to PTHREAD_SCOPE_SYSTEM 
+ to kernel by setting scope attribute to PTHREAD_SCOPE_SYSTEM
 \begin_inset Float table
 wide false
 sideways false
@@ -773,7 +829,7 @@ Table 3: Context Switching overhead
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="3">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -878,7 +934,10 @@ Kernel thread context switch
 
 \end_inset
 
-
+Analysis : Table shows that context switch time is of the order of a system
+ call, and that kenrel thread conext switch does not vary much with process
+ context switch time.
+ 
 \end_layout
 
 \end_body
