@@ -3,8 +3,8 @@
 \documentclass[english]{article}
 \usepackage[T1]{fontenc}
 \usepackage[latin9]{inputenc}
-\setcounter{secnumdepth}{3}
-\setcounter{tocdepth}{3}
+\usepackage{array}
+\usepackage{multirow}
 \usepackage{graphicx}
 
 \makeatletter
@@ -26,7 +26,11 @@
 {\end{list}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
-\makeatother
+
+
+
+
+\usepackage{babel}
 
 \makeatother
 
@@ -49,18 +53,16 @@ of Amazon EC2. Some articles claims that the actual performance of
 the hardware is much less than the advertised number. We are interested
 in testing to see whether such claim is accurate, and if not, what
 the reason might be. As a later part of the project, we are also interested
-in the overhead of the linux containers(LXC) on a virtualized platform. 
+in the overhead of the linux containers(LXC) on a virtualized platform.
 
 The aim of this project is to measure performance on Amazon's EC2
 instances. For the first portion of this project we measure the overhead
 of CPU, scheduling and OS services. All the code for our tests was
 written in C. We used gcc 4.6.1 with no optimizations to run our code.
-Collecting machine description information, measuring procedure call
-overhead and measurment overhead were done by Phuc Xuan Nguyen. Measurement
-of system call overhead, process creation, kernel thread creation,
-process context switch and kernel context switch were done by Vineet
-Kumar. We think we spent in total of around 7 working days for this
-portion of the project.
+Machine description, measuring procedure call overhead, measuring
+memory latency, RAM bandwidth and networking experiments were done
+by Phuc Xuan Nguyen. Rest of the measurements were done by Vineet
+Kumar. I think we spent a total of 20 working days on the project.
 
 
 \section{Machine Description}
@@ -123,7 +125,7 @@ Function 2:
 \begin{itemize}
 \item Perform a random function f 
 \end{itemize}
-\item Return the difference between the current and the initial clock counter
+\item Return the difference between the current and the initial clock counter 
 \end{itemize}
 To measure the for loop overhead, we set up two procedures: (1) using
 a for loop to execute a function foo() N times, and (2) (baseline)
@@ -156,16 +158,16 @@ function f.
 
 We calculate the difference in the result of Function 2 and Function
 1 and divide that by N to find the overhead of RDTSC. In the t1.micro
-instance.
+instance. 
 \begin{itemize}
-\item Without RDTSC: average 6.00 cycles \textasciitilde{} 2.25 $\mu s$
-\item With RDTSC: average 48 cycles \textasciitilde{} 18.04 $\mu s$
-\item The overhead of RDSTC: \textasciitilde{} 15.789$\mu s$
+\item Without RDTSC: average 6.00 cycles \textasciitilde{} 2.25 $\mu s$ 
+\item With RDTSC: average 48 cycles \textasciitilde{} 18.04 $\mu s$ 
+\item The overhead of RDSTC: \textasciitilde{} 15.789$\mu s$ 
 \end{itemize}
-After running the for-loop experiment 10000 times, we find that
+After running the for-loop experiment 10000 times, we find that 
 \begin{itemize}
-\item Without for loop: average 12.6 cycles \textasciitilde{} $4.7\mu s$
-\item With for loop: average 21.8 cycles \textasciitilde{} $7.89\mu s$
+\item Without for loop: average 12.6 cycles \textasciitilde{} $4.7\mu s$ 
+\item With for loop: average 21.8 cycles \textasciitilde{} $7.89\mu s$ 
 \end{itemize}
 So the overhead of the for loop is the difference between these, which
 is 9.2 cycles \textasciitilde{} $3.38\mu s$.
@@ -205,11 +207,9 @@ The result, gathered after running 1,000,000 iterations, is shown
 in Figure 1.
 
 \begin{figure}
-\includegraphics{procedure_call_result}
+\includegraphics[scale=0.5]{procedure_call_result}
 
 \caption{Procedure call as a function of paramter count}
-
-
 \end{figure}
 
 
@@ -217,7 +217,7 @@ in Figure 1.
 \subsubsection{Discussion}
 
 The result shows a roughly linear increase in the clock cycles, as
-predicted. 
+predicted.
 
 
 \subsection{System call overhead}
@@ -226,7 +226,7 @@ predicted.
 procedure call, it needs to do more checks and in effect is the only
 domain crossing for our system. Thus we predict that system call overhead
 time would be little more than a procedure call. Its hard to make
-other predictions for a system call.
+other predictions for a system call. 
 \item Experiment: To measure system call overhead, we need to do measurements
 on a system call that does not do much work. We do our experiments
 by calling {}``getpid()'' and by writing one byte to the device
@@ -235,26 +235,24 @@ loop within a single process, the system call gets cached and thus
 does not give us correct overhead measurements. Thus, we handle this
 issue by running the test within a context of different process. We
 run the test for 10,000 iterations. Table 1 shows the results:Results:
-The following table shows the results:
-\item Results :
-\item 
-\begin{table}
+The following table shows the results: 
+\item Results : 
+\end{enumerate}
 Table 1: System call overhead
 
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|c|}
 \hline 
-System Call  & Time - cached($\mu$s)  & Std. dev- cached  & Time - uncached($\mu$s)  & Std. dev - uncached\tabularnewline
+System Call  & Time - cached($\mu$s)  & Std. dev & Time - uncached($\mu$s)  & Std. dev\tabularnewline
 \hline 
 \hline 
-getpid()  & 0.00358 (9.66 M cycles) & 1.71$\%$  & 7.89 (21303 M cycles) & 5.74\%\tabularnewline
+getpid()  & 0.00358 (9.66 M cycles)  & 1.71$\%$  & 7.89 (21303 M cycles)  & 5.74\%\tabularnewline
 \hline 
-write to devnull  & 0.00341 (9.21 M cycles) & 1.06\%  & 1.45 (3915 M cycles) & 53\%\tabularnewline
+write to devnull  & 0.00341 (9.21 M cycles)  & 1.06\%  & 1.45 (3915 M cycles)  & 53\%\tabularnewline
 \hline 
 \end{tabular}
-\end{table}
-
+\begin{enumerate}
 \item Analysis : We see that the time needed for a getpid() is slightly
-more than a procedure call
+more than a procedure call 
 \end{enumerate}
 
 \subsection{Task creation time}
@@ -286,7 +284,7 @@ Table 2: Process and kernel thread creation overhead
 \hline 
 Process creation  & 264.73(714771 M cycles)  & 18.48\%\tabularnewline
 \hline 
-Kernel Thread Creation  & 1.89 (5103 M cycles) & 35 \tabularnewline
+Kernel Thread Creation  & 1.89 (5103 M cycles)  & 35 \tabularnewline
 \hline 
 \end{tabular}
 \end{table}
@@ -300,7 +298,7 @@ needs to do domain crossing, whereas kernel thread creation does not.
 \subsection{Context switching time}
 
 Prediction : We expect context switch time to take atleast the time
-needed for system call. 
+needed for system call.
 
 We measure context switch time by passing a token across pipes. We
 create a total of 4 pipes to accomplish a 2 way communication and
@@ -336,15 +334,17 @@ Table 3: Context Switching overhead
  & Time ($\mu$s)  & Std. deviation\tabularnewline
 \hline 
 \hline 
-Process Context Switch  & 2.19 (5913 M cycles) & 27.8\%\tabularnewline
+Process Context Switch  & 2.19 (5913 M cycles)  & 27.8\%\tabularnewline
 \hline 
-Kernel thread context switch  & 2.65 (7155 M cycles) & 38.5\%\tabularnewline
+Kernel thread context switch  & 2.65 (7155 M cycles)  & 38.5\%\tabularnewline
 \hline 
 \end{tabular}
 \end{table}
+
+
 Analysis : Table shows that context switch time is of the order of
 a system call, and that kenrel thread conext switch does not vary
-much with process context switch time. 
+much with process context switch time.
 
 
 \section{Memory}
@@ -433,13 +433,13 @@ from an array. This can be due to system overhead.
 
 \subsection{RAM Bandwidth}
 \begin{description}
-\item [{{a)}}] Prediction - To Predict RAM Bandwidth we need to multiply
+\item [{{{a)}}}] Prediction - To Predict RAM Bandwidth we need to multiply
 the memory bus size with the memory clock speed. Our bus size is 64
 bits which is 8 bytes. And our memory clock speed is 800 MhZ - which
 gives us a maximum theoretical transfer rate of 6.4 GB /s. We predict
 that the write bandwidth would be less than this as it needs to handle
 issue of page cache eviction 
-\item [{{b)}}] Experiment for Read Bandwidth : \end{description}
+\item [{{{b)}}}] Experiment for Read Bandwidth : \end{description}
 \begin{itemize}
 \item We create a large array in the memory 
 \item In a tight unrolled for loop - we access array elements at interval
@@ -452,14 +452,14 @@ for accessing 4 bytes. We found this to be 4K.
 We would have read 32K in one loop iteration. We divide this by time
 taken and get the memory bandwidth\end{itemize}
 \begin{description}
-\item [{{c)}}] Experiment for Write Bandwidth :\end{description}
+\item [{{{c)}}}] Experiment for Write Bandwidth :\end{description}
 \begin{itemize}
 \item We create a large array in the memory 
 \item In a tight unrolled for loop - We add 2 fixed integers and store the
 result at an interval of L2 size in our array 
 \item We stop the timer that was started before 8 memory write operations\end{itemize}
 \begin{description}
-\item [{{d)}}] Block Transfer:\end{description}
+\item [{{{d)}}}] Block Transfer:\end{description}
 \begin{itemize}
 \item We do a L2 size block transfer from one memory location to another
 in a loop. We measure time it takes to do the transfer 
@@ -467,8 +467,8 @@ in a loop. We measure time it takes to do the transfer
 Thus we expect the bandwidth seen by this operation as average of
 read and write bandwidth \end{itemize}
 \begin{description}
-\item [{{e)}}] Results: 
-\item [{{%
+\item [{{{e)}}}] Results: 
+\item [{{{%
 \begin{tabular}{|c|c|c|c|}
 \hline 
  & CPU Cycles  & Std. Deviation  & Bandwidth GB /s\tabularnewline
@@ -480,8 +480,8 @@ Write  & 98, 781  & 0.03\%  & 0.878\tabularnewline
 \hline 
 Block Transfer  & 49,223,872  & 0.023\%  & 1.279\tabularnewline
 \hline 
-\end{tabular}}}] ~ 
-\item [{{f)}}] Analysis:\end{description}
+\end{tabular}}}}] ~ 
+\item [{{{f)}}}] Analysis:\end{description}
 \begin{itemize}
 \item Block tarnsfer test results macth up with what we expected. We expected
 the bandwidth to be average of read and write bandwidth numbers 
@@ -494,12 +494,13 @@ in the hypervisor's shadow page tables.
 
 \subsection{Page Fault Service Time :}
 \begin{description}
-\item [{{a)}}] Prediction :- To estimate page fault service time we wanted
-to measure raw time of reading a page from disk. This is hard to do
-from user space - but we can measure tiem to read a file without using
-page cache. This would still include an overhead of copying data between
-buffers - so while making an estimate we should note that this estimate
-at best would be upper bound on page fault service time. \end{description}
+\item [{{{a)}}}] Prediction :- To estimate page fault service time
+we wanted to measure raw time of reading a page from disk. This is
+hard to do from user space - but we can measure tiem to read a file
+without using page cache. This would still include an overhead of
+copying data between buffers - so while making an estimate we should
+note that this estimate at best would be upper bound on page fault
+service time. \end{description}
 \begin{itemize}
 \item We measure the time to do a disk read by measuring cost of doing a
 direct read using 'dd' and redirecting output to /dev/null 
@@ -508,13 +509,13 @@ is a gross underestimate - it includes time to copy data between buffers
 \item Based on the clock speed and bandwidth and page size - we estimate
 that around 2.1 million cycles will be needed\end{itemize}
 \begin{description}
-\item [{{b)}}] Experiment :- Our aim is to measure the page fault service
-time. This means we want to measure the time it takes to do a major
-page fault. This includes the time needed to bring the page from the
-disk. We use an mmap (followed by no read aheads) to measure the same.
-This works as mmap does a on demand page fault. Page is faulted in
-only on first access. Below is a detailed description of our experiment
-:\end{description}
+\item [{{{b)}}}] Experiment :- Our aim is to measure the page fault
+service time. This means we want to measure the time it takes to do
+a major page fault. This includes the time needed to bring the page
+from the disk. We use an mmap (followed by no read aheads) to measure
+the same. This works as mmap does a on demand page fault. Page is
+faulted in only on first access. Below is a detailed description of
+our experiment :\end{description}
 \begin{itemize}
 \item Create a Large File ( > 1.5 G) using a simple dd tool 
 \item Determine page size by calling 'getconf PAGESIZE' - This gives us
@@ -532,10 +533,10 @@ both with and without MADV\_RANDOM
 major page fault. 
 \item End timer. Report the time between start and end of timer.\end{itemize}
 \begin{description}
-\item [{{c)}}] Results : The table below shows results for reading one
-page (4096) . Column 1 and 2 show results without madvise and Columns
-3 and 4 show results with madvise 
-\item [{{%
+\item [{{{c)}}}] Results : The table below shows results for reading
+one page (4096) . Column 1 and 2 show results without madvise and
+Columns 3 and 4 show results with madvise 
+\item [{{{%
 \begin{tabular}{|c|c|c|c|}
 \hline 
  & Avg. CPU Cycles  & Std. Deviation(CPU Cycles)  & Time\tabularnewline
@@ -545,8 +546,8 @@ Page Fault (w/o) madvise  & 58,578  & 0.7625\%  & 21ms\tabularnewline
 \hline 
 Page Fault (with) madvise  & 197,190  & 0.1898\%  & 73 ms\tabularnewline
 \hline 
-\end{tabular}}}] ~ 
-\item [{{d)}}] Analysis :-\end{description}
+\end{tabular}}}}] ~ 
+\item [{{{d)}}}] Analysis :-\end{description}
 \begin{itemize}
 \item Our estimate was 2.1 Million CPU Cycles and what we got was 0.2 Million
 cycles. As explained above, our estimate had some overhead due to
@@ -558,7 +559,7 @@ most likely incorrect. We think if we dont do madvise, we hit pages
 in page cache and thus the fault time does not remain as major page
 fault service rate. 
 \item To conclude, to measure page fault service rate, we need to ensure
-that the page is brough in by reading from disk
+that the page is brough in by reading from disk 
 \end{itemize}
 
 \section{Networking}
@@ -623,12 +624,12 @@ rtt min/avg/max/mdev = 0.020/0.033/0.094/0.005 ms
 \begin{centering}
 \begin{tabular}{|c|c|c|c|c|}
 \hline 
- & min & max & average & std\tabularnewline
+ & min  & max  & average  & std\tabularnewline
 \hline 
 \hline 
-clock cycles & 1867624 & 2417024 & 2066900 & 122720\tabularnewline
+clock cycles  & 1867624  & 2417024  & 2066900  & 122720\tabularnewline
 \hline 
-time(ms) & 0.718  & 0.9296 & 0.79  & 0.0472\tabularnewline
+time(ms)  & 0.718  & 0.9296  & 0.79  & 0.0472\tabularnewline
 \hline 
 \end{tabular}
 \par\end{centering}
@@ -641,12 +642,12 @@ time(ms) & 0.718  & 0.9296 & 0.79  & 0.0472\tabularnewline
 \begin{centering}
 \begin{tabular}{|c|c|c|c|c|}
 \hline 
- & min & max & average & std\tabularnewline
+ & min  & max  & average  & std\tabularnewline
 \hline 
 \hline 
-clock cycles & 738360 & 982656 & 793550 & 56771\tabularnewline
+clock cycles  & 738360  & 982656  & 793550  & 56771\tabularnewline
 \hline 
-time(ms) & 0.2839 & 0.377 & 0.31 & 0.0218\tabularnewline
+time(ms)  & 0.2839  & 0.377  & 0.31  & 0.0218\tabularnewline
 \hline 
 \end{tabular}
 \par\end{centering}
@@ -722,18 +723,16 @@ Figure shows the bandwidth corresponding to the total data size sent
 and Figure shows the same image for the loopback device.
 
 \begin{figure}
-\includegraphics{bandwidth}
+\includegraphics[scale=0.25]{bandwidth}
 
 \caption{Bandwidth for remote case vs. total data size transfer}
 \end{figure}
 
 
 \begin{figure}
-\includegraphics{bandwidth\lyxdot loopback}
+\includegraphics[scale=0.25]{bandwidth\lyxdot loopback}
 
 \caption{Bandwidth for loopback case vs. total data size transfer}
-
-
 \end{figure}
 
 
@@ -760,11 +759,11 @@ The slowdown in bandwidth is mostly due to network transaction.
 
 \subsection{Connection overhead}
 
-To set up a connection, TCP uses the three-way handshake:
+To set up a connection, TCP uses the three-way handshake: 
 \begin{enumerate}
-\item The client sends the SYN to the server
-\item Server responds with SYN-ACK.
-\item Client responds with ACK.
+\item The client sends the SYN to the server 
+\item Server responds with SYN-ACK. 
+\item Client responds with ACK. 
 \end{enumerate}
 To tear down a connection, TCP uses the 2 pairs of FIN and ACK.
 
@@ -795,34 +794,34 @@ establishment time.
 
 \subsubsection{Results}
 
-For loopback devices
+For loopback devices 
 \begin{enumerate}
 \item Connection setup:
 
 \begin{enumerate}
-\item Clock cycles(min/avg/max/std): 794200 / 821370 / 1041488 / 46339
-\item Time in ms (min/avg/max/std): .3054 / 0.3159 / 0.4005 / 0.0178
+\item Clock cycles(min/avg/max/std): 794200 / 821370 / 1041488 / 46339 
+\item Time in ms (min/avg/max/std): .3054 / 0.3159 / 0.4005 / 0.0178 
 \end{enumerate}
 \item Connection teardown:
 
 \begin{enumerate}
-\item Clock cycles(min/avg/max/std): 56072 / 66172 / 100328 / 11630
-\item Time in ms (min/avg/max/std): 0.021 / 0.025 / 0.038 / 0.0044
+\item Clock cycles(min/avg/max/std): 56072 / 66172 / 100328 / 11630 
+\item Time in ms (min/avg/max/std): 0.021 / 0.025 / 0.038 / 0.0044 
 \end{enumerate}
 \end{enumerate}
-For remote connection
+For remote connection 
 \begin{enumerate}
 \item Connection setup:
 
 \begin{enumerate}
-\item Clock cycles(min/avg/max/std): 804200 / 1248600 / 13799088 / 1741300
-\item Time in ms (min/avg/max/std): .0.309 / .48024 / 5.01 / 0.669730769
+\item Clock cycles(min/avg/max/std): 804200 / 1248600 / 13799088 / 1741300 
+\item Time in ms (min/avg/max/std): .0.309 / .48024 / 5.01 / 0.669730769 
 \end{enumerate}
 \item Connection teardown:
 
 \begin{enumerate}
-\item Clock cycles(min/avg/max/std): 32856 / 51060 / 158280 / 23913
-\item Time in ms (min/avg/max/std): 0.01264 / 0.019 / 0.0608 / 0.00919
+\item Clock cycles(min/avg/max/std): 32856 / 51060 / 158280 / 23913 
+\item Time in ms (min/avg/max/std): 0.01264 / 0.019 / 0.0608 / 0.00919 
 \end{enumerate}
 \end{enumerate}
 
@@ -858,7 +857,7 @@ loopback case yields very similar statistics.
 Size of file cache should be some fraction of the memory (RAM) in
 the system. Kernel reserves some memory ( in terms of data structures
 it uses and say by the paging dameon). Bottomline, we expect it to
-be some fraction of RAM on system. 
+be some fraction of RAM on system.
 
 
 \subsubsection{Experiment}
@@ -874,11 +873,11 @@ steps describe the experiment:
 in the entire file in the file cache
 
 \begin{itemize}
-\item Step2: Read the same file again, measure the time to read it
+\item Step2: Read the same file again, measure the time to read it 
 \item Step 3: Increase the file size, repeat Step 1 and Step 2. 
 \item Step 4: Continue Step 3, after a while when file size is larger than
-file cache, the per block read time will increase
-\item Step 5: Plot per block read time as function of file size
+file cache, the per block read time will increase 
+\item Step 5: Plot per block read time as function of file size 
 \end{itemize}
 \end{itemize}
 
@@ -886,32 +885,32 @@ file cache, the per block read time will increase
 
 \begin{tabular}{|c|c|c|}
 \hline 
-File Size (MB) & CPU Cycles / MB & Time (ms)\tabularnewline
+File Size (MB)  & CPU Cycles / MB  & Time (ms)\tabularnewline
 \hline 
 \hline 
-150 & 1424800 & 50\tabularnewline
+150  & 1424800  & 50\tabularnewline
 \hline 
-200 & 4325000 & 1.6\tabularnewline
+200  & 4325000  & 1.6\tabularnewline
 \hline 
-250 & 7284000 & 2.7\tabularnewline
+250  & 7284000  & 2.7\tabularnewline
 \hline 
-300 & 35256000 & 13.1\tabularnewline
+300  & 35256000  & 13.1\tabularnewline
 \hline 
-350 & 34762000 & 12.9\tabularnewline
+350  & 34762000  & 12.9\tabularnewline
 \hline 
-400 & 30081000 & 11.1\tabularnewline
+400  & 30081000  & 11.1\tabularnewline
 \hline 
-450 & 36080000 & 13.4\tabularnewline
+450  & 36080000  & 13.4\tabularnewline
 \hline 
-500 & 28269000 & 10.5\tabularnewline
+500  & 28269000  & 10.5\tabularnewline
 \hline 
-550 & 29327000 & 10.9\tabularnewline
+550  & 29327000  & 10.9\tabularnewline
 \hline 
-600 & 27972000 & 10.4\tabularnewline
+600  & 27972000  & 10.4\tabularnewline
 \hline 
-650 & 31478000 & 11.7\tabularnewline
+650  & 31478000  & 11.7\tabularnewline
 \hline 
-700 & 30541000 & 11.3\tabularnewline
+700  & 30541000  & 11.3\tabularnewline
 \hline 
 \end{tabular}
 
@@ -941,35 +940,35 @@ sequential read on disk involves less seek time.
 used
 
 \begin{enumerate}
-\item Read the file sequentially, measure time
+\item Read the file sequentially, measure time 
 \item Read the file randomly (using preads) and generating a random offset,
-measure time
+measure time 
 \item Repeat (a) - (c) by increasing the size of file\end{enumerate}
 \begin{lyxlist}{00.00.0000}
-\item [{%
+\item [{{%
 \begin{tabular}{|c|c|c|c|c|}
 \hline 
-File Size(MB) & Sequential (CPU Cycles)(Million) & Sequential Time(ms) & Random (CPU Cycles) & Random(ms)\tabularnewline
+File Size(MB)  & \multirow{1}{*}{Sequential (M CPU) } & Sequential Time(ms)  & Random (M CPU)  & Random(ms)\tabularnewline
 \hline 
 \hline 
-32 & .584 & 0.2163 & .597 & 0.2212\tabularnewline
+32  & .584  & 0.2163  & .597  & 0.2212\tabularnewline
 \hline 
-64 & .587 & 0.2212 & .598 & 0.2218\tabularnewline
+64  & .587  & 0.2212  & .598  & 0.2218\tabularnewline
 \hline 
-150 & .591 & 0.2190 & .601 & 0.2229\tabularnewline
+150  & .591  & 0.2190  & .601  & 0.2229\tabularnewline
 \hline 
-200 & .591 & 0.2192 & .619 & 0.2296\tabularnewline
+200  & .591  & 0.2192  & .619  & 0.2296\tabularnewline
 \hline 
-250 & .613 & 0.2273 & .645 & 0.2391\tabularnewline
+250  & .613  & 0.2273  & .645  & 0.2391\tabularnewline
 \hline 
-300 & .616 & 0.2285 & .615 & 0.2279\tabularnewline
+300  & .616  & 0.2285  & .615  & 0.2279\tabularnewline
 \hline 
-400 & .588 & 0.2179 & .609 & 0.2257\tabularnewline
+400  & .588  & 0.2179  & .609  & 0.2257\tabularnewline
 \hline 
  &  &  &  & \tabularnewline
-\end{tabular}}]~
+\end{tabular}}}] ~ 
 \end{lyxlist}
-\item \includegraphics[scale=0.5]{res4_2}
+\item \includegraphics[scale=0.5]{res4_2} 
 \end{enumerate}
 
 \subsubsection{Analysis}
@@ -991,30 +990,30 @@ be very high.
 \subsubsection{Experiment}
 \begin{itemize}
 \item Continuing the setup of last experiment, start a nfs server and share
-a folder across network
-\item Mount the shared folder on a client
+a folder across network 
+\item Mount the shared folder on a client 
 \item Read files in increasing order of size from the client, measure time
-to do sequential as well as random read
+to do sequential as well as random read 
 \end{itemize}
 
 \subsubsection{Results:}
 
 \begin{tabular}{|c|c|c|c|c|}
 \hline 
-File Size(MB) & CPU Cycles - Sequential(Million) & Time(s)  & CPU Cycles- Random (M) & Time\tabularnewline
+File Size(MB)  & CPU Cycles - Sequential(Million)  & Time(s)  & CPU Cycles- Random (M)  & Time\tabularnewline
 \hline 
 \hline 
-32 & 2555 & 0.9465 & 2885 & 1.0686\tabularnewline
+32  & 2555  & 0.9465  & 2885  & 1.0686\tabularnewline
 \hline 
-64 & 2456 & 0.9099 & 2617 & 0.9694\tabularnewline
+64  & 2456  & 0.9099  & 2617  & 0.9694\tabularnewline
 \hline 
-150 & 2933 & 1.0861 & 2673 & 0.9898\tabularnewline
+150  & 2933  & 1.0861  & 2673  & 0.9898\tabularnewline
 \hline 
-200 & 2830 & 1.0485 & 2816 & 1.0430\tabularnewline
+200  & 2830  & 1.0485  & 2816  & 1.0430\tabularnewline
 \hline 
-250 & 3012 & 1.1171 & 2915 & 1.0795\tabularnewline
+250  & 3012  & 1.1171  & 2915  & 1.0795\tabularnewline
 \hline 
-300 & 2569 & 0.9515 & 2837 & 1.0509\tabularnewline
+300  & 2569  & 0.9515  & 2837  & 1.0509\tabularnewline
 \end{tabular}
 
 \includegraphics[scale=0.5]{res4_3}
@@ -1050,16 +1049,16 @@ in read time as there are other processes reading on the disk.
 \begin{itemize}
 \item Set block size as 4K. Note that this does not need to be 4K, but when
 measuring time per block size, we would make this block size as fixed
-so that we are comparing the same quantities
+so that we are comparing the same quantities 
 \item Create a file of 100M. Read it for a fixed number of iterations (Do
-repeated reads on this file)
+repeated reads on this file) 
 \item Open all files for this experiment using O\_DIRECT. This ensures that
-we are not using file cache and are directly accessing disk
+we are not using file cache and are directly accessing disk 
 \item Measure time taken to read one block when 1 other process is reading
-a file (this file is differnt than first process
-\item Measure time to read when 2 processes are reading 2 different files
-\item Continue this experiment by reading a file when 20 processes are running.
-\item Compare results
+a file (this file is differnt than first process 
+\item Measure time to read when 2 processes are reading 2 different files 
+\item Continue this experiment by reading a file when 20 processes are running. 
+\item Compare results 
 \end{itemize}
 
 \subsubsection{Results}
@@ -1072,7 +1071,7 @@ a file (this file is differnt than first process
 Graph shows that as number of processes increase the variations in
 reading time increase too. Thus our original prediction that as more
 processes try to read a file on sam disk, seek time should vary a
-lot, seems correct
+lot, seems correct 
 \begin{thebibliography}{References}
 \bibitem{key-2}Larry McVoy and Carl Staelin, lmbench: Portable Tools
 for Performance Analysis, Proc. of USENIX Annual Technical Conference,
