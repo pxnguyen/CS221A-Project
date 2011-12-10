@@ -1,84 +1,69 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX file created by tex2lyx 2.0.0
+\lyxformat 345
 \begin_document
 \begin_header
 \textclass article
 \begin_preamble
-\makeatother
+
+
+
+
+\usepackage{babel}
 \end_preamble
 \use_default_options false
-\maintain_unincluded_children false
 \language english
-\language_package default
-\inputencoding auto
-\fontencoding global
+\inputencoding latin9
 \font_roman default
 \font_sans default
 \font_typewriter default
 \font_default_family default
-\use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
-\default_output_format default
-\output_sync 0
-\bibtex_command default
-\index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref 0
 \papersize default
 \use_geometry false
 \use_amsmath 1
 \use_esint 1
-\use_mhchem 1
-\use_mathdots 1
 \cite_engine basic
 \use_bibtopic false
-\use_indices false
 \paperorientation portrait
-\suppress_date false
-\use_refstyle 0
-\index Index
-\shortcut idx
-\color #008000
-\end_index
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\paragraph_indentation default
+\defskip medskip
 \quotes_language english
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
 \tracking_changes false
 \output_changes false
-\html_math_output 0
-\html_css_as_file 0
-\html_be_strict false
 \end_header
 
 \begin_body
 
 \begin_layout Title
+
 Performance Report on EC2 Instances
 \end_layout
 
 \begin_layout Author
+
 Vineet Kumar, Phuc Xuan Nguyen
 \end_layout
 
 \begin_layout Section
+
 Introduction
 \end_layout
 
 \begin_layout Standard
-Amazon Elastic Compute Cloud(EC2) is a web service that provides resizable
- computing power through the cloud.
- There are lots of disputes online regarding the correctness of the 
+
+Amazon Elastic Compute Cloud(EC2) is a web service that provides resizable computing power through the cloud. There are lots of disputes online regarding the correctness of the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -86,248 +71,247 @@ rated
 \begin_inset Quotes erd
 \end_inset
 
- hardware performance of Amazon EC2.
- Some articles claims that the actual performance of the hardware is much
- less than the advertised number.
- We are interested in testing to see whether such claim is accurate, and
- if not, what the reason might be.
- As a later part of the project, we are also interested in the overhead
- of the linux containers(LXC) on a virtualized platform.
- 
+ hardware performance of Amazon EC2. Some articles claims that the actual performance of the hardware is much less than the advertised number. We are interested in testing to see whether such claim is accurate, and if not, what the reason might be. As a later part of the project, we are also interested in the overhead of the linux containers(LXC) on a virtualized platform.
 \end_layout
 
 \begin_layout Standard
-The aim of this project is to measure performance on Amazon's EC2 instances.
- For the first portion of this project we measure the overhead of CPU, schedulin
-g and OS services.
- All the code for our tests was written in C.
- We used gcc 4.6.1 with no optimizations to run our code.
- Collecting machine description information, measuring procedure call overhead
- and measurment overhead were done by Phuc Xuan Nguyen.
- Measurement of system call overhead, process creation, kernel thread creation,
- process context switch and kernel context switch were done by Vineet Kumar.
- We think we spent in total of around 7 working days for this portion of
- the project.
+
+The aim of this project is to measure performance on Amazon's EC2 instances. For the first portion of this project we measure the overhead of CPU, scheduling and OS services. All the code for our tests was written in C. We used gcc 4.6.1 with no optimizations to run our code. Collecting machine description information, measuring procedure call overhead and measurment overhead were done by Phuc Xuan Nguyen. Measurement of system call overhead, process creation, kernel thread creation, process context switch and kernel context switch were done by Vineet Kumar. We think we spent in total of around 7 working days for this portion of the project.
 \end_layout
 
 \begin_layout Section
+
 Machine Description
 \end_layout
 
 \begin_layout Standard
-We are aiming to measure the performance on the Amazon's t1.micro instances.
- 
+
+We are aiming to measure the performance on the Amazon's t1.micro instances. 
 \end_layout
 
 \begin_layout Itemize
+
 1 Elastic Computing Unit 
 \end_layout
 
 \begin_layout Itemize
+
 Processor: Intel(c) Xeon(R) CPU E5430 @ 2.66Ghz.
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
+
 12M L2 Cache, 1333 Mhz FSB 
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
+
 Memory: 592MiB 
 \end_layout
 
 \begin_layout Itemize
+
 Netword card speed
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
+
 Between EC2 Instances: 100MB/s 
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
+
 Disk: Amazon Elastic Block (EBS)
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
+
 Size: 7.9GB 
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
+
 Operating System: Ubuntu Oneric 11.10 
 \end_layout
 
 \begin_layout Section
+
 CPU Operation
 \end_layout
 
 \begin_layout Standard
-For all our experiments we use RDTSC counter.
- To obtain time we divide this by the CPU frequency.
- Also of all the data seen, we discard the best and worst 10% of data and
- then take mean values.
+
+For all our experiments we use RDTSC counter. To obtain time we divide this by the CPU frequency. Also of all the data seen, we discard the best and worst 10% of data and then take mean values.
 \end_layout
 
 \begin_layout Subsection
+
 Measurement overhead
 \end_layout
 
 \begin_layout Subsubsection
+
 Experiment
 \end_layout
 
 \begin_layout Standard
-We are using RDTSC as a fine-grained counter to measure the performance.
- In order to calculate the overhead of RDSTC, we run the following experiment.
+
+We are using RDTSC as a fine-grained counter to measure the performance. In order to calculate the overhead of RDSTC, we run the following experiment.
 \end_layout
 
 \begin_layout Standard
+
 Function 1: 
 \end_layout
 
 \begin_layout Itemize
+
 Get initial clock counter 
 \end_layout
 
 \begin_layout Itemize
+
 Repeat N times:
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
+
 Run RDTSC 
 \end_layout
 
 \begin_layout Itemize
+
 Perform a random function f 
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Return the difference between the current and the initial clock counter.
- 
+
+Return the difference between the current and the initial clock counter. 
 \end_layout
 
 \begin_layout Standard
+
 Function 2: 
 \end_layout
 
 \begin_layout Itemize
+
 Get initial clock counter 
 \end_layout
 
 \begin_layout Itemize
+
 Repeat N times:
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
+
 Perform a random function f 
 \end_layout
 
 \end_deeper
 \begin_layout Itemize
-Return the difference between the current and the initial clock counter
+
+Return the difference between the current and the initial clock counter 
 \end_layout
 
 \begin_layout Standard
-To measure the for loop overhead, we set up two procedures: (1) using a
- for loop to execute a function foo() N times, and (2) (baseline) just execute
- foo() N times in a row.
- N is a random number generated uniformly from 100-1000.
- Through experiment we find that the amount of times does not affect the
- interested results.
+
+To measure the for loop overhead, we set up two procedures: (1) using a for loop to execute a function foo() N times, and (2) (baseline) just execute foo() N times in a row. N is a random number generated uniformly from 100-1000. Through experiment we find that the amount of times does not affect the interested results.
 \end_layout
 
 \begin_layout Subsubsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-In this experiment, we would expect that Function 2 will yield higher clock
- cycles than than Function 1 due to the overhead of RDTSC.
- Since these are simple function, the overhead will be significany compared
- to the overall running time.
+
+In this experiment, we would expect that Function 2 will yield higher clock cycles than than Function 1 due to the overhead of RDTSC. Since these are simple function, the overhead will be significany compared to the overall running time.
 \end_layout
 
 \begin_layout Standard
-For for-loop overhead prediction, we expect at least 6 clocks cycles will
- be added on to the baseline performance due to the facts that the for-loop
- must be recompiled into different read word, set word instructions.
- For example, for(int x = 0; x < N; x++) would incur the cost for set x
- to be 0, the branch to check if x less than N, and a read word and set
- word for x++.
- These are not accounted for the branch overhead caused by the for loop
- logic itself.
+
+For for-loop overhead prediction, we expect at least 6 clocks cycles will be added on to the baseline performance due to the facts that the for-loop must be recompiled into different read word, set word instructions. For example, for(int x = 0; x < N; x++) would incur the cost for set x to be 0, the branch to check if x less than N, and a read word and set word for x++. These are not accounted for the branch overhead caused by the for loop logic itself.
 \end_layout
 
 \begin_layout Subsubsection
+
 Results
 \end_layout
 
 \begin_layout Standard
-We find that the variance becomes insignificant when N is around 10000.
- We avoid the possible compiler optimization by running the random function
- f.
+
+We find that the variance becomes insignificant when N is around 10000. We avoid the possible compiler optimization by running the random function f.
 \end_layout
 
 \begin_layout Standard
-We calculate the difference in the result of Function 2 and Function 1 and
- divide that by N to find the overhead of RDTSC.
- In the t1.micro instance.
+
+We calculate the difference in the result of Function 2 and Function 1 and divide that by N to find the overhead of RDTSC. In the t1.micro instance. 
 \end_layout
 
 \begin_layout Itemize
+
 Without RDTSC: average 6.00 cycles ~ 2.25 
 \begin_inset Formula $\mu s$
 \end_inset
 
-
+ 
 \end_layout
 
 \begin_layout Itemize
+
 With RDTSC: average 48 cycles ~ 18.04 
 \begin_inset Formula $\mu s$
 \end_inset
 
-
+ 
 \end_layout
 
 \begin_layout Itemize
+
 The overhead of RDSTC: ~ 15.789
 \begin_inset Formula $\mu s$
 \end_inset
 
-
+ 
 \end_layout
 
 \begin_layout Standard
-After running the for-loop experiment 10000 times, we find that
+
+After running the for-loop experiment 10000 times, we find that 
 \end_layout
 
 \begin_layout Itemize
+
 Without for loop: average 12.6 cycles ~ 
 \begin_inset Formula $4.7\mu s$
 \end_inset
 
-
+ 
 \end_layout
 
 \begin_layout Itemize
+
 With for loop: average 21.8 cycles ~ 
 \begin_inset Formula $7.89\mu s$
 \end_inset
 
-
+ 
 \end_layout
 
 \begin_layout Standard
-So the overhead of the for loop is the difference between these, which is
- 9.2 cycles ~ 
+
+So the overhead of the for loop is the difference between these, which is 9.2 cycles ~ 
 \begin_inset Formula $3.38\mu s$
 \end_inset
 
@@ -335,74 +319,79 @@ So the overhead of the for loop is the difference between these, which is
 \end_layout
 
 \begin_layout Subsubsection
+
 Dicussion
 \end_layout
 
 \begin_layout Standard
-The result is as expected.
- Function 2 yields an extra 42 cycles as the overhead for RDSTC.
- Our for loop estimations falls on the short side as the number of extra
- cycles is 9.2 cycles instead of 6 as predicted.
+
+The result is as expected. Function 2 yields an extra 42 cycles as the overhead for RDSTC. Our for loop estimations falls on the short side as the number of extra cycles is 9.2 cycles instead of 6 as predicted.
 \end_layout
 
 \begin_layout Standard
-We notice that these overhead is significant in our experiment, 700% for
- RDTSC and 75% for for-loop.
- However, these are simple experiment, where the running time order stays
- around single or double digits of microseconds.
- Later experiment will show the other software overhead would result much
- higher overhead than these measurement overhead.
+
+We notice that these overhead is significant in our experiment, 700% for RDTSC and 75% for for-loop. However, these are simple experiment, where the running time order stays around single or double digits of microseconds. Later experiment will show the other software overhead would result much higher overhead than these measurement overhead.
 \end_layout
 
 \begin_layout Subsection
+
 Procedure call overhead
 \end_layout
 
 \begin_layout Standard
-To find out the procedure call overhead, we perform two simple operations
- (int x = 1+1; int y = x;) in 9 different scenarios: no procedure call and
- procedure calls with the 0-7 parameters.
+
+To find out the procedure call overhead, we perform two simple operations (int x = 1+1; int y = x;) in 9 different scenarios: no procedure call and procedure calls with the 0-7 parameters.
 \end_layout
 
 \begin_layout Subsubsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-We expect a roughly linear increase in the clock cycles as the number of
- parameters increase.
- The reason of linearity is that we have no reason to doubt any other factors
- could contribute to the increase in clock cycle besides the time to copy
- the value into the parameter
+
+We expect a roughly linear increase in the clock cycles as the number of parameters increase. The reason of linearity is that we have no reason to doubt any other factors could contribute to the increase in clock cycle besides the time to copy the value into the parameter
 \end_layout
 
 \begin_layout Subsubsection
+
 Results
 \end_layout
 
 \begin_layout Standard
-The result, gathered after running 1,000,000 iterations, is shown in Figure
- 1.
+
+The result, gathered after running 1,000,000 iterations, is shown in Figure 1.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Standard
+
+
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename procedure_call_result.png
-	scale 50
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename procedure_call_result.eps
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+
+
 \begin_inset Caption
 
-\begin_layout Plain Layout
-Clock cycle(param)* -1 means no procedure call
+
+\begin_layout Standard
+
+Procedure call as a function of paramter count
 \end_layout
 
 \end_inset
@@ -416,31 +405,28 @@ Clock cycle(param)* -1 means no procedure call
 \end_layout
 
 \begin_layout Subsubsection
+
 Discussion
 \end_layout
 
 \begin_layout Standard
+
 The result shows a roughly linear increase in the clock cycles, as predicted.
- 
 \end_layout
 
 \begin_layout Subsection
+
 System call overhead
 \end_layout
 
 \begin_layout Enumerate
-Prediction - System Call is a slightly heavier call than a simple procedure
- call, it needs to do more checks and in effect is the only domain crossing
- for our system.
- Thus we predict that system call overhead time would be little more than
- a procedure call.
- Its hard to make other predictions for a system call.
+
+Prediction - System Call is a slightly heavier call than a simple procedure call, it needs to do more checks and in effect is the only domain crossing for our system. Thus we predict that system call overhead time would be little more than a procedure call. Its hard to make other predictions for a system call. 
 \end_layout
 
 \begin_layout Enumerate
-Experiment: To measure system call overhead, we need to do measurements
- on a system call that does not do much work.
- We do our experiments by calling 
+
+Experiment: To measure system call overhead, we need to do measurements on a system call that does not do much work. We do our experiments by calling 
 \begin_inset Quotes eld
 \end_inset
 
@@ -448,44 +434,45 @@ getpid()
 \begin_inset Quotes erd
 \end_inset
 
- and by writing one byte to the device devnull.
- We notice that for both these experiments if we run a tight loop within
- a single process, the system call gets cached and thus does not give us
- correct overhead measurements.
- Thus, we handle this issue by running the test within a context of different
- process.
- We run the test for 10,000 iterations.
- Table 1 shows the results:Results: The following table shows the results:
+ and by writing one byte to the device devnull. We notice that for both these experiments if we run a tight loop within a single process, the system call gets cached and thus does not give us correct overhead measurements. Thus, we handle this issue by running the test within a context of different process. We run the test for 10,000 iterations. Table 1 shows the results:Results: The following table shows the results: 
 \end_layout
 
 \begin_layout Enumerate
-Results :
+
+Results : 
 \end_layout
 
 \begin_layout Enumerate
+
+
 \begin_inset Float table
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
+
 Table 1: System call overhead
 \end_layout
 
-\begin_layout Plain Layout
-\begin_inset Tabular
+\begin_layout Standard
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="3" columns="5">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 System Call 
 \end_layout
 
@@ -494,7 +481,8 @@ System Call
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Time - cached(
 \begin_inset Formula $\mu$
 \end_inset
@@ -507,9 +495,9 @@ s)
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-Std.
- dev- cached 
+\begin_layout Standard
+
+Std. dev- cached 
 \end_layout
 
 \end_inset
@@ -517,7 +505,8 @@ Std.
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Time - uncached(
 \begin_inset Formula $\mu$
 \end_inset
@@ -530,9 +519,9 @@ s)
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-Std.
- dev - uncached
+\begin_layout Standard
+
+Std. dev - uncached
 \end_layout
 
 \end_inset
@@ -542,7 +531,8 @@ Std.
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 getpid() 
 \end_layout
 
@@ -551,8 +541,9 @@ getpid()
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-0.00358 (9.66 M cycles)
+\begin_layout Standard
+
+0.00358 (9.66 M cycles) 
 \end_layout
 
 \end_inset
@@ -560,7 +551,8 @@ getpid()
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 1.71
 \begin_inset Formula $\%$
 \end_inset
@@ -573,8 +565,9 @@ getpid()
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-7.89 (21303 M cycles)
+\begin_layout Standard
+
+7.89 (21303 M cycles) 
 \end_layout
 
 \end_inset
@@ -582,7 +575,8 @@ getpid()
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 5.74%
 \end_layout
 
@@ -593,7 +587,8 @@ getpid()
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 write to devnull 
 \end_layout
 
@@ -602,8 +597,9 @@ write to devnull
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-0.00341 (9.21 M cycles)
+\begin_layout Standard
+
+0.00341 (9.21 M cycles) 
 \end_layout
 
 \end_inset
@@ -611,7 +607,8 @@ write to devnull
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 1.06% 
 \end_layout
 
@@ -620,8 +617,9 @@ write to devnull
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-1.45 (3915 M cycles)
+\begin_layout Standard
+
+1.45 (3915 M cycles) 
 \end_layout
 
 \end_inset
@@ -629,7 +627,8 @@ write to devnull
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 53%
 \end_layout
 
@@ -649,78 +648,79 @@ write to devnull
 \end_layout
 
 \begin_layout Enumerate
-Analysis : We see that the time needed for a getpid() is slightly more than
- a procedure call
+
+Analysis : We see that the time needed for a getpid() is slightly more than a procedure call 
 \end_layout
 
 \begin_layout Subsection
+
 Task creation time
 \end_layout
 
 \begin_layout Standard
-Prediction : We epect task creation to take much more time than a system
- call, as it involves context switch when a new task needs to created.
- We expect kernel thread creation to take less time as in effect a user
- thread is tied to kernel.
+
+Prediction : We epect task creation to take much more time than a system call, as it involves context switch when a new task needs to created. We expect kernel thread creation to take less time as in effect a user thread is tied to kernel.
 \end_layout
 
 \begin_layout Standard
-We measure the task creation time by calling the timer before a fork() is
- issued and immediately inside the child process.
- We repeat this process for 10, 000 iterations.
- To measure the creation time for a kernel thread - we use posix thread
- attributes to tie a user thread to a kernel level thread.
- We repeat these experiments 10,000 times.
- We use the following test methodology : 
+
+We measure the task creation time by calling the timer before a fork() is issued and immediately inside the child process. We repeat this process for 10, 000 iterations. To measure the creation time for a kernel thread - we use posix thread attributes to tie a user thread to a kernel level thread. We repeat these experiments 10,000 times. We use the following test methodology : 
 \end_layout
 
 \begin_layout Enumerate
+
 Repeat N times 
 \end_layout
 
 \begin_layout Enumerate
+
 Start timer 
 \end_layout
 
 \begin_layout Enumerate
+
 Fork a process 
 \end_layout
 
 \begin_layout Enumerate
+
 Stop timer inside the child process 
 \end_layout
 
 \begin_layout Standard
+
+
 \begin_inset Float table
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
+
 Table 2: Process and kernel thread creation overhead
 \end_layout
 
-\begin_layout Plain Layout
-\begin_inset Tabular
+\begin_layout Standard
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Time(
 \begin_inset Formula $\mu$
 \end_inset
@@ -733,9 +733,9 @@ s)
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-Std.
- deviation
+\begin_layout Standard
+
+Std. deviation
 \end_layout
 
 \end_inset
@@ -745,7 +745,8 @@ Std.
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Process creation 
 \end_layout
 
@@ -754,7 +755,8 @@ Process creation
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 264.73(714771 M cycles) 
 \end_layout
 
@@ -763,7 +765,8 @@ Process creation
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 18.48%
 \end_layout
 
@@ -774,7 +777,8 @@ Process creation
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Kernel Thread Creation 
 \end_layout
 
@@ -783,8 +787,9 @@ Kernel Thread Creation
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-1.89 (5103 M cycles)
+\begin_layout Standard
+
+1.89 (5103 M cycles) 
 \end_layout
 
 \end_inset
@@ -792,7 +797,8 @@ Kernel Thread Creation
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 35 
 \end_layout
 
@@ -812,108 +818,106 @@ Kernel Thread Creation
 \end_layout
 
 \begin_layout Standard
-Analysis : Process creation time takes much longer than kernel thread creation,
- a part of the explanation could be that process creation needs to do domain
- crossing, whereas kernel thread creation does not.
+
+Analysis : Process creation time takes much longer than kernel thread creation, a part of the explanation could be that process creation needs to do domain crossing, whereas kernel thread creation does not.
 \end_layout
 
 \begin_layout Subsection
+
 Context switching time
 \end_layout
 
 \begin_layout Standard
-Prediction : We expect context switch time to take atleast the time needed
- for system call.
- 
+
+Prediction : We expect context switch time to take atleast the time needed for system call.
 \end_layout
 
 \begin_layout Standard
-We measure context switch time by passing a token across pipes.
- We create a total of 4 pipes to accomplish a 2 way communication and measure
- the round trip time.
- This roundtrip time per process contains time needed to conext switch twice
- and time for a read and write call using pipes.
- We however, do not remove the pipe overhead - that needs to be done.
- We run our experiments for N iterations
+
+We measure context switch time by passing a token across pipes. We create a total of 4 pipes to accomplish a 2 way communication and measure the round trip time. This roundtrip time per process contains time needed to conext switch twice and time for a read and write call using pipes. We however, do not remove the pipe overhead - that needs to be done. We run our experiments for N iterations
 \end_layout
 
 \begin_layout Standard
-This is the test methodology we use for measuring a process context switch
- time 
+
+This is the test methodology we use for measuring a process context switch time 
 \end_layout
 
 \begin_layout Enumerate
-Create 2 pipes for communication between process 1 and process 2 (pipe1)
- 
+
+Create 2 pipes for communication between process 1 and process 2 (pipe1) 
 \end_layout
 
 \begin_layout Enumerate
-Create 2 pipes for communication between process 2 and process 1 (pipe2)
- 
+
+Create 2 pipes for communication between process 2 and process 1 (pipe2) 
 \end_layout
 
 \begin_layout Enumerate
+
 Repeat N times
 \end_layout
 
 \begin_deeper
 \begin_layout Enumerate
+
 Start timer 
 \end_layout
 
 \begin_layout Enumerate
+
 Repeat (c) -(d) for some iterations 
 \end_layout
 
 \begin_layout Enumerate
-Process 1 writes to pipe1, process 2 reads it.
- Note that these will be blocking reads.
- This causes Process 2 to start running 
+
+Process 1 writes to pipe1, process 2 reads it. Note that these will be blocking reads. This causes Process 2 to start running 
 \end_layout
 
 \begin_layout Enumerate
-Process 2 writes to pipe2 and process 1 reads it.
- This will again cause a context switch 
+
+Process 2 writes to pipe2 and process 1 reads it. This will again cause a context switch 
 \end_layout
 
 \begin_layout Enumerate
+
 Stop timer 
 \end_layout
 
 \end_deeper
 \begin_layout Standard
-For Measuring kernel thread context switch time we use posix threads bound
- to kernel by setting scope attribute to PTHREAD_SCOPE_SYSTEM
+
+For Measuring kernel thread context switch time we use posix threads bound to kernel by setting scope attribute to PTHREAD_SCOPE_SYSTEM 
 \begin_inset Float table
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
+
 Table 3: Context Switching overhead
 \end_layout
 
-\begin_layout Plain Layout
-\begin_inset Tabular
+\begin_layout Standard
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Time (
 \begin_inset Formula $\mu$
 \end_inset
@@ -926,9 +930,9 @@ s)
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-Std.
- deviation
+\begin_layout Standard
+
+Std. deviation
 \end_layout
 
 \end_inset
@@ -938,7 +942,8 @@ Std.
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Process Context Switch 
 \end_layout
 
@@ -947,8 +952,9 @@ Process Context Switch
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-2.19 (5913 M cycles)
+\begin_layout Standard
+
+2.19 (5913 M cycles) 
 \end_layout
 
 \end_inset
@@ -956,7 +962,8 @@ Process Context Switch
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 27.8%
 \end_layout
 
@@ -967,7 +974,8 @@ Process Context Switch
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Kernel thread context switch 
 \end_layout
 
@@ -976,8 +984,9 @@ Kernel thread context switch
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-2.65 (7155 M cycles)
+\begin_layout Standard
+
+2.65 (7155 M cycles) 
 \end_layout
 
 \end_inset
@@ -985,7 +994,8 @@ Kernel thread context switch
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 38.5%
 \end_layout
 
@@ -1001,110 +1011,98 @@ Kernel thread context switch
 
 \end_inset
 
-Analysis : Table shows that context switch time is of the order of a system
- call, and that kenrel thread conext switch does not vary much with process
- context switch time.
- 
+
+\end_layout
+
+\begin_layout Standard
+
+Analysis : Table shows that context switch time is of the order of a system call, and that kenrel thread conext switch does not vary much with process context switch time.
 \end_layout
 
 \begin_layout Section
+
 Memory
 \end_layout
 
 \begin_layout Subsection
+
 RAM Access Time
 \end_layout
 
 \begin_layout Subsection
+
 Experiment
 \end_layout
 
 \begin_layout Standard
-We are setting up a similar pointer-chase experiment as Bradley et.
- al.
- We want to measure performance of repeated memory access to integer arrays
- with various sizes.
+
+We are setting up a similar pointer-chase experiment as Bradley et. al. We want to measure performance of repeated memory access to integer arrays with various sizes.
 \end_layout
 
 \begin_layout Subsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-Based on our hardware, we predict the the number of cycles will be relatively
- small(~5 cycles) for L1 cache hit.
- The cycles will stay constant until the array size is close to the L1 cache
- size.
- The number cycles will increase at this point.
- The cycles will remain fairly constant until the array size is close to
- the L2 cache size, but there will be bump as page replacement policy in
- Linux is non-deterministic.
- After the L2 cache size, the number of cycles will increase and flat out
- with the rate equal to the memory read rate.
+
+Based on our hardware, we predict the the number of cycles will be relatively small(~5 cycles) for L1 cache hit. The cycles will stay constant until the array size is close to the L1 cache size. The number cycles will increase at this point. The cycles will remain fairly constant until the array size is close to the L2 cache size, but there will be bump as page replacement policy in Linux is non-deterministic. After the L2 cache size, the number of cycles will increase and flat out with the rate equal to the memory read rate.
 \end_layout
 
 \begin_layout Standard
-Since we don't expect Amazon's VM to pin the guest OSes to cores.
- Some of the data points will have significant variation due to cache contention
- with other guest OSes running on the same core.
- We still hope to discover some trend regardless of this anomaly.
+
+Since we don't expect Amazon's VM to pin the guest OSes to cores. Some of the data points will have significant variation due to cache contention with other guest OSes running on the same core. We still hope to discover some trend regardless of this anomaly.
 \end_layout
 
 \begin_layout Subsection
+
 Result
 \end_layout
 
 \begin_layout Standard
-Figure 1 describes the average number of cycle to read an individual integer
- from an array with different size on our local machine with the L1 cache
- of 2x32KB instruction caches and 2x32KB caches and the L2 Cache of 1MB.
- The Y-axis describes the number of cycle.
- The X-axis describes the size of the array.
+
+Figure 1 describes the average number of cycle to read an individual integer from an array with different size on our local machine with the L1 cache of 2x32KB instruction caches and 2x32KB caches and the L2 Cache of 1MB. The Y-axis describes the number of cycle. The X-axis describes the size of the array.
 \end_layout
 
 \begin_layout Standard
+
 Figure 2 describes the same content but on EC2 t1.micro instance.
 \end_layout
 
 \begin_layout Subsection
+
 Discussion
 \end_layout
 
 \begin_layout Standard
-Figure 1 matches out prediction.
- On our local machine, we find that the average number of cycles to access
- an individual integer in an array stays constant at ~9 cycles and increase
- at the L1 cache size of 32KB.
- Since Linux use non-deterministic page mapping policy, cache conflicts
- occur quite often after in the L2 cache.
- The number of cycles flat out at ~96 cycles.
+
+Figure 1 matches out prediction. On our local machine, we find that the average number of cycles to access an individual integer in an array stays constant at ~9 cycles and increase at the L1 cache size of 32KB. Since Linux use non-deterministic page mapping policy, cache conflicts occur quite often after in the L2 cache. The number of cycles flat out at ~96 cycles.
 \end_layout
 
 \begin_layout Standard
-However, Figure 2 has many high spikes due to cache contention as the Xen
- does not pin the guest OSes to cores.
- If we ignore these data points.
- Figure 3 is the result of taking out the spike.
- From Figure 3, we can see that it averages at ~10 cycles per read for L1
- cache and increase to ~17 cycles around at the array size of 16KB.
- The number of cycles to read an integer from memory is ~178 cycles.
+
+However, Figure 2 has many high spikes due to cache contention as the Xen does not pin the guest OSes to cores. If we ignore these data points. Figure 3 is the result of taking out the spike. From Figure 3, we can see that it averages at ~10 cycles per read for L1 cache and increase to ~17 cycles around at the array size of 16KB. The number of cycles to read an integer from memory is ~178 cycles.
 \end_layout
 
 \begin_layout Standard
-We underestimated the number of cycles to read an individual integer from
- an array.
- This can be due to system overhead.
+
+We underestimated the number of cycles to read an individual integer from an array. This can be due to system overhead.
 \end_layout
 
 \begin_layout Standard
+
+
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename mem_latency_local.jpg
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename mem_latency_local
 	scale 25
 
 \end_inset
@@ -1112,10 +1110,14 @@ status open
 
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+
 \begin_inset Caption
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
+
 Memory Latency on Local Machine
 \end_layout
 
@@ -1130,14 +1132,19 @@ Memory Latency on Local Machine
 \end_layout
 
 \begin_layout Standard
+
+
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename mem_latency_ec2_unmodifed.jpg
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename mem_latency_ec2_unmodifed.eps
 	scale 25
 
 \end_inset
@@ -1145,10 +1152,14 @@ status open
 
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+
 \begin_inset Caption
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
+
 Memory Latency on EC2
 \end_layout
 
@@ -1163,14 +1174,19 @@ Memory Latency on EC2
 \end_layout
 
 \begin_layout Standard
+
+
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename mem_latency_ec2_modifed.jpg
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename mem_latency_ec2_modifed.eps
 	scale 30
 
 \end_inset
@@ -1178,10 +1194,14 @@ status open
 
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+
 \begin_inset Caption
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
+
 Memory Latency on EC2, removed outliners
 \end_layout
 
@@ -1196,14 +1216,28 @@ Memory Latency on EC2, removed outliners
 \end_layout
 
 \begin_layout Subsection
+
 RAM Bandwidth
 \end_layout
 
 \begin_layout Description
+
+
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1214,27 +1248,45 @@ a)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
 
 }
 \end_layout
 
 \end_inset
 
- Prediction - To Predict RAM Bandwidth we need to multiply the memory bus
- size with the memory clock speed.
- Our bus size is 64 bits which is 8 bytes.
- And our memory clock speed is 800 MhZ - which gives us a maximum theoretical
- transfer rate of 6.4 GB /s.
- We predict that the write bandwidth would be less than this as it needs
- to handle issue of page cache eviction 
-\end_layout
 
-\begin_layout Description
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Prediction - To Predict RAM Bandwidth we need to multiply the memory bus size with the memory clock speed. Our bus size is 64 bits which is 8 bytes. And our memory clock speed is 800 MhZ - which gives us a maximum theoretical transfer rate of 6.4 GB /s. We predict that the write bandwidth would be less than this as it needs to handle issue of page cache eviction 
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1245,7 +1297,18 @@ b)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 }
 \end_layout
@@ -1256,34 +1319,43 @@ status collapsed
 \end_layout
 
 \begin_layout Itemize
+
 We create a large array in the memory 
 \end_layout
 
 \begin_layout Itemize
-In a tight unrolled for loop - we access array elements at interval of L2
- cache size and add them up.
- Since our loop is unrolled 4 times, this operation should cause 8 memory
- read operations from DRAM to L2 
+
+In a tight unrolled for loop - we access array elements at interval of L2 cache size and add them up. Since our loop is unrolled 4 times, this operation should cause 8 memory read operations from DRAM to L2 
 \end_layout
 
 \begin_layout Itemize
-We measure beforehand amount of data transfered between DRAM and L2 for
- accessing 4 bytes.
- We found this to be 4K.
- 
+
+We measure beforehand amount of data transfered between DRAM and L2 for accessing 4 bytes. We found this to be 4K. 
 \end_layout
 
 \begin_layout Itemize
-We stop the timer that was started before 8 memory read opertaions.
- We would have read 32K in one loop iteration.
- We divide this by time taken and get the memory bandwidth
+
+We stop the timer that was started before 8 memory read opertaions. We would have read 32K in one loop iteration. We divide this by time taken and get the memory bandwidth
 \end_layout
 
 \begin_layout Description
+
+
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1294,7 +1366,18 @@ c)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 }
 \end_layout
@@ -1305,23 +1388,38 @@ status collapsed
 \end_layout
 
 \begin_layout Itemize
+
 We create a large array in the memory 
 \end_layout
 
 \begin_layout Itemize
-In a tight unrolled for loop - We add 2 fixed integers and store the result
- at an interval of L2 size in our array 
+
+In a tight unrolled for loop - We add 2 fixed integers and store the result at an interval of L2 size in our array 
 \end_layout
 
 \begin_layout Itemize
+
 We stop the timer that was started before 8 memory write operations
 \end_layout
 
 \begin_layout Description
+
+
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1332,7 +1430,18 @@ d)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 }
 \end_layout
@@ -1343,22 +1452,33 @@ status collapsed
 \end_layout
 
 \begin_layout Itemize
-We do a L2 size block transfer from one memory location to another in a
- loop.
- We measure time it takes to do the transfer 
+
+We do a L2 size block transfer from one memory location to another in a loop. We measure time it takes to do the transfer 
 \end_layout
 
 \begin_layout Itemize
-This transfer will involve one read and possibly 2 write operations.
- Thus we expect the bandwidth seen by this operation as average of read
- and write bandwidth 
+
+This transfer will involve one read and possibly 2 write operations. Thus we expect the bandwidth seen by this operation as average of read and write bandwidth 
 \end_layout
 
 \begin_layout Description
+
+
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1369,7 +1489,18 @@ e)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 }
 \end_layout
@@ -1380,10 +1511,12 @@ status collapsed
 \end_layout
 
 \begin_layout Description
+
+
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
 
 {
 \end_layout
@@ -1391,27 +1524,35 @@ status collapsed
 \end_inset
 
 
-\begin_inset Tabular
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="4" columns="4">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \end_inset
 </cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 CPU Cycles 
 \end_layout
 
@@ -1420,9 +1561,9 @@ CPU Cycles
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-Std.
- Deviation 
+\begin_layout Standard
+
+Std. Deviation 
 \end_layout
 
 \end_inset
@@ -1430,7 +1571,8 @@ Std.
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Bandwidth GB /s
 \end_layout
 
@@ -1441,7 +1583,8 @@ Bandwidth GB /s
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Read 
 \end_layout
 
@@ -1450,7 +1593,8 @@ Read
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 41,518 
 \end_layout
 
@@ -1459,7 +1603,8 @@ Read
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 0.05 % 
 \end_layout
 
@@ -1468,7 +1613,8 @@ Read
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 2.076
 \end_layout
 
@@ -1479,7 +1625,8 @@ Read
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Write 
 \end_layout
 
@@ -1488,7 +1635,8 @@ Write
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 98, 781 
 \end_layout
 
@@ -1497,7 +1645,8 @@ Write
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 0.03% 
 \end_layout
 
@@ -1506,7 +1655,8 @@ Write
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 0.878
 \end_layout
 
@@ -1517,7 +1667,8 @@ Write
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Block Transfer 
 \end_layout
 
@@ -1526,7 +1677,8 @@ Block Transfer
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 49,223,872 
 \end_layout
 
@@ -1535,7 +1687,8 @@ Block Transfer
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 0.023% 
 \end_layout
 
@@ -1544,7 +1697,8 @@ Block Transfer
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 1.279
 \end_layout
 
@@ -1559,7 +1713,18 @@ Block Transfer
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 }
 \end_layout
@@ -1568,16 +1733,30 @@ status collapsed
 
  
 \begin_inset space ~
+
 \end_inset
 
  
 \end_layout
 
 \begin_layout Description
+
+
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1588,7 +1767,18 @@ f)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 }
 \end_layout
@@ -1599,29 +1789,38 @@ status collapsed
 \end_layout
 
 \begin_layout Itemize
-Block tarnsfer test results macth up with what we expected.
- We expected the bandwidth to be average of read and write bandwidth numbers
- 
+
+Block tarnsfer test results macth up with what we expected. We expected the bandwidth to be average of read and write bandwidth numbers 
 \end_layout
 
 \begin_layout Itemize
-However, out orginal estimation seems to be off by quite a lot.
- We expected to see a bandwidth of 6GB /s and saw 2 GB / s - We can attribute
- it to the fact that we are running it on top of hypervisor and thus page
- fault time could take more time as PTEs need to be installed in the hypervisor'
-s shadow page tables.
- 
+
+However, out orginal estimation seems to be off by quite a lot. We expected to see a bandwidth of 6GB /s and saw 2 GB / s - We can attribute it to the fact that we are running it on top of hypervisor and thus page fault time could take more time as PTEs need to be installed in the hypervisor's shadow page tables. 
 \end_layout
 
 \begin_layout Subsection
+
 Page Fault Service Time :
 \end_layout
 
 \begin_layout Description
+
+
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1632,43 +1831,60 @@ a)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
 
 }
 \end_layout
 
 \end_inset
 
- Prediction :- To estimate page fault service time we wanted to measure
- raw time of reading a page from disk.
- This is hard to do from user space - but we can measure tiem to read a
- file without using page cache.
- This would still include an overhead of copying data between buffers -
- so while making an estimate we should note that this estimate at best would
- be upper bound on page fault service time.
- 
-\end_layout
 
-\begin_layout Itemize
-We measure the time to do a disk read by measuring cost of doing a direct
- read using 'dd' and redirecting output to /dev/null 
-\end_layout
-
-\begin_layout Itemize
-We notice that this gives us a speed of 5.1 MB/s -> Note that this is a gross
- underestimate - it includes time to copy data between buffers 
-\end_layout
-
-\begin_layout Itemize
-Based on the clock speed and bandwidth and page size - we estimate that
- around 2.1 million cycles will be needed
-\end_layout
-
-\begin_layout Description
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Prediction :- To estimate page fault service time we wanted to measure raw time of reading a page from disk. This is hard to do from user space - but we can measure tiem to read a file without using page cache. This would still include an overhead of copying data between buffers - so while making an estimate we should note that this estimate at best would be upper bound on page fault service time. 
+\end_layout
+
+\begin_layout Itemize
+
+We measure the time to do a disk read by measuring cost of doing a direct read using 'dd' and redirecting output to /dev/null 
+\end_layout
+
+\begin_layout Itemize
+
+We notice that this gives us a speed of 5.1 MB/s -> Note that this is a gross underestimate - it includes time to copy data between buffers 
+\end_layout
+
+\begin_layout Itemize
+
+Based on the clock speed and bandwidth and page size - we estimate that around 2.1 million cycles will be needed
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1679,70 +1895,85 @@ b)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
 
 }
 \end_layout
 
 \end_inset
 
- Experiment :- Our aim is to measure the page fault service time.
- This means we want to measure the time it takes to do a major page fault.
- This includes the time needed to bring the page from the disk.
- We use an mmap (followed by no read aheads) to measure the same.
- This works as mmap does a on demand page fault.
- Page is faulted in only on first access.
- Below is a detailed description of our experiment :
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Experiment :- Our aim is to measure the page fault service time. This means we want to measure the time it takes to do a major page fault. This includes the time needed to bring the page from the disk. We use an mmap (followed by no read aheads) to measure the same. This works as mmap does a on demand page fault. Page is faulted in only on first access. Below is a detailed description of our experiment :
 \end_layout
 
 \begin_layout Itemize
+
 Create a Large File ( > 1.5 G) using a simple dd tool 
 \end_layout
 
 \begin_layout Itemize
-Determine page size by calling 'getconf PAGESIZE' - This gives us page size
- of 4096 bytes or 4K on our system 
+
+Determine page size by calling 'getconf PAGESIZE' - This gives us page size of 4096 bytes or 4K on our system 
 \end_layout
 
 \begin_layout Itemize
-Call a posix_fadvise with flag FADVISE_DONTNEED.
- We do this to make sure that a page is always brought in from the disk
- and not cached.
- This is equivalent of dropping the page cache (by calling echo 1 > /proc/sys/vm
-/drop_cache) 
+
+Call a posix_fadvise with flag FADVISE_DONTNEED. We do this to make sure that a page is always brought in from the disk and not cached. This is equivalent of dropping the page cache (by calling echo 1 > /proc/sys/vm/drop_cache) 
 \end_layout
 
 \begin_layout Itemize
-Memory Map the file using 'mmap' system call with flags 'MAP_PRIVATE'.
- We do this as we just want to do a read on the file.
- 
+
+Memory Map the file using 'mmap' system call with flags 'MAP_PRIVATE'. We do this as we just want to do a read on the file. 
 \end_layout
 
 \begin_layout Itemize
-Do a madvise on the memory mapped area using MADV_RANDOM.
- Do tests both with and without MADV_RANDOM 
+
+Do a madvise on the memory mapped area using MADV_RANDOM. Do tests both with and without MADV_RANDOM 
 \end_layout
 
 \begin_layout Itemize
+
 Start timer 
 \end_layout
 
 \begin_layout Itemize
-Access a random page by reading a page address.
- This will cause a major page fault.
- 
+
+Access a random page by reading a page address. This will cause a major page fault. 
 \end_layout
 
 \begin_layout Itemize
-End timer.
- Report the time between start and end of timer.
+
+End timer. Report the time between start and end of timer.
 \end_layout
 
 \begin_layout Description
+
+
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1753,23 +1984,34 @@ c)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
 
 }
 \end_layout
 
 \end_inset
 
- Results : The table below shows results for reading one page (4096) .
- Column 1 and 2 show results without madvise and Columns 3 and 4 show results
- with madvise 
-\end_layout
 
-\begin_layout Description
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ Results : The table below shows results for reading one page (4096) . Column 1 and 2 show results without madvise and Columns 3 and 4 show results with madvise 
+\end_layout
+
+\begin_layout Description
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1777,19 +2019,36 @@ status collapsed
 \end_inset
 
 
-\begin_inset Tabular
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="3" columns="4">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
 
+\begin_layout Standard
+
+Avg. CPU Cycles 
 \end_layout
 
 \end_inset
@@ -1797,9 +2056,9 @@ status collapsed
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-Avg.
- CPU Cycles 
+\begin_layout Standard
+
+Std. Deviation(CPU Cycles) 
 \end_layout
 
 \end_inset
@@ -1807,17 +2066,8 @@ Avg.
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-Std.
- Deviation(CPU Cycles) 
-\end_layout
+\begin_layout Standard
 
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
 Time
 \end_layout
 
@@ -1828,7 +2078,8 @@ Time
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Page Fault (w/o) madvise 
 \end_layout
 
@@ -1837,7 +2088,8 @@ Page Fault (w/o) madvise
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 58,578 
 \end_layout
 
@@ -1846,7 +2098,8 @@ Page Fault (w/o) madvise
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 0.7625% 
 \end_layout
 
@@ -1855,7 +2108,8 @@ Page Fault (w/o) madvise
 <cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 21ms
 \end_layout
 
@@ -1866,7 +2120,8 @@ Page Fault (w/o) madvise
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Page Fault (with) madvise 
 \end_layout
 
@@ -1875,7 +2130,8 @@ Page Fault (with) madvise
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 197,190 
 \end_layout
 
@@ -1884,7 +2140,8 @@ Page Fault (with) madvise
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 0.1898% 
 \end_layout
 
@@ -1893,7 +2150,8 @@ Page Fault (with) madvise
 <cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 73 ms
 \end_layout
 
@@ -1908,7 +2166,18 @@ Page Fault (with) madvise
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 }
 \end_layout
@@ -1917,16 +2186,30 @@ status collapsed
 
  
 \begin_inset space ~
+
 \end_inset
 
  
 \end_layout
 
 \begin_layout Description
+
+
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 {
 \end_layout
@@ -1937,7 +2220,18 @@ d)
 \begin_inset ERT
 status collapsed
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
 
 }
 \end_layout
@@ -1948,180 +2242,180 @@ status collapsed
 \end_layout
 
 \begin_layout Itemize
-Our estimate was 2.1 Million CPU Cycles and what we got was 0.2 Million cycles.
- As explained above, our estimate had some overhead due to copying of data
- between buffers.
- Thus we expected the actual time to be smaller 
+
+Our estimate was 2.1 Million CPU Cycles and what we got was 0.2 Million cycles. As explained above, our estimate had some overhead due to copying of data between buffers. Thus we expected the actual time to be smaller 
 \end_layout
 
 \begin_layout Itemize
-Its interesting to note that if we dont give an madvise 'advice' for our
- memory map region, we get better numbers.
- But those numbers are most likely incorrect.
- We think if we dont do madvise, we hit pages in page cache and thus the
- fault time does not remain as major page fault service rate.
- 
+
+Its interesting to note that if we dont give an madvise 'advice' for our memory map region, we get better numbers. But those numbers are most likely incorrect. We think if we dont do madvise, we hit pages in page cache and thus the fault time does not remain as major page fault service rate. 
 \end_layout
 
 \begin_layout Itemize
-To conclude, to measure page fault service rate, we need to ensure that
- the page is brough in by reading from disk
+
+To conclude, to measure page fault service rate, we need to ensure that the page is brough in by reading from disk 
 \end_layout
 
 \begin_layout Section
+
 Networking
 \end_layout
 
 \begin_layout Subsection
+
 Round trip time
 \end_layout
 
 \begin_layout Standard
-Round trip time is defined as the transmission times between two points
- of a signal.
- More specifically, it is defined as the time it takes for a packet to be
- sent plus the time for the response to come back.
+
+Round trip time is defined as the transmission times between two points of a signal. More specifically, it is defined as the time it takes for a packet to be sent plus the time for the response to come back.
 \end_layout
 
 \begin_layout Subsubsection
+
 Experiment setup
 \end_layout
 
 \begin_layout Standard
-In the effort to compare the result with the ping time, we make sure that
- we are the same amount of bytes.
- In Unix's ping, the default option is 84 bytes per ping.
- We know that the TCP header is 20 bytes, we will pad 64 bytes on to the
- data, to create the same amount.
+
+In the effort to compare the result with the ping time, we make sure that we are the same amount of bytes. In Unix's ping, the default option is 84 bytes per ping. We know that the TCP header is 20 bytes, we will pad 64 bytes on to the data, to create the same amount.
 \end_layout
 
 \begin_layout Standard
-We set up two identical instances: one server and one client.
- Client will boot up, acquire the connection with the server, and then send
- him a 64 bytes message (84 bytes with TCP headers).
- Server will process the message, copy it into its buffer and send it back
- to the client.
- Client receives the messages, record statistics, and quit.
+
+We set up two identical instances: one server and one client. Client will boot up, acquire the connection with the server, and then send him a 64 bytes message (84 bytes with TCP headers). Server will process the message, copy it into its buffer and send it back to the client. Client receives the messages, record statistics, and quit.
 \end_layout
 
 \begin_layout Subsubsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-To get an idea of the RTT time between the two EC2 instances, we ping the
- server instance.
- Results from pinging yields the average of .444ms.
- We predict that our experimental result will be less than the estimate
- due to the fact that ICMP is handled in the kernel and TCP needs to cross
- the protection boundary.
- In the CPU scheduling part, we reported that the cost of the syscall is
- around
+
+To get an idea of the RTT time between the two EC2 instances, we ping the server instance. Results from pinging yields the average of .444ms. We predict that our experimental result will be less than the estimate due to the fact that ICMP is handled in the kernel and TCP needs to cross the protection boundary. In the CPU scheduling part, we reported that the cost of the syscall is around
 \end_layout
 
 \begin_layout Subsubsection
+
 Experimentation Results
 \end_layout
 
 \begin_layout Standard
-After 1000 data points, we come to the following statitics.
- Table 1 describes the round trip remote statistics.
- Table 2 describes the round trip loopback statistics.
+
+After 1000 data points, we come to the following statitics. Table 1 describes the round trip remote statistics. Table 2 describes the round trip loopback statistics.
 \end_layout
 
 \begin_layout Standard
+
 The following results obtained by the following command in Unix: 
 \series bold
 ping -c 100 10.211.45.127
+\series default
+
 \end_layout
 
 \begin_layout Standard
+
 --- 10.211.45.127 ping statistics ---
 \end_layout
 
 \begin_layout Standard
+
 100 packets transmitted, 100 received, 0% packet loss, time 98998ms
 \end_layout
 
 \begin_layout Standard
+
 rtt min/avg/max/mdev = 0.356/0.590/11.939/1.154 ms
 \end_layout
 
 \begin_layout Standard
+
 The following results obtained by the following command in Unix: 
 \series bold
 ping localhost
+\series default
+
 \end_layout
 
 \begin_layout Standard
+
 --- localhost.localdomain ping statistics ---
 \end_layout
 
 \begin_layout Standard
+
 723 packets transmitted, 723 received, 0% packet loss, time 722009ms
 \end_layout
 
 \begin_layout Standard
+
 rtt min/avg/max/mdev = 0.020/0.033/0.094/0.005 ms
 \end_layout
 
 \begin_layout Standard
+
+
 \begin_inset Float table
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
 \align center
-\begin_inset Tabular
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="3" columns="5">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-min
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-max
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-average
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+min 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+max 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+average 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 std
 \end_layout
 
@@ -2129,46 +2423,51 @@ std
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-clock cycles
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1867624
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2417024
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2066900
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+clock cycles 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+1867624 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2417024 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2066900 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 122720
 \end_layout
 
@@ -2176,46 +2475,51 @@ clock cycles
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-time(ms)
+\begin_layout Standard
+
+time(ms) 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 0.718 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-0.9296
+\begin_layout Standard
+
+0.9296 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 0.79 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 0.0472
 \end_layout
 
@@ -2229,10 +2533,14 @@ time(ms)
 
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+
 \begin_inset Caption
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
+
 Round trip remote statistics
 \end_layout
 
@@ -2247,62 +2555,67 @@ Round trip remote statistics
 \end_layout
 
 \begin_layout Standard
+
+
 \begin_inset Float table
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
 \align center
-\begin_inset Tabular
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="3" columns="5">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-min
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-max
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-average
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+min 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+max 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+average 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 std
 \end_layout
 
@@ -2310,46 +2623,51 @@ std
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-clock cycles
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-738360
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-982656
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-793550
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+clock cycles 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+738360 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+982656 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+793550 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 56771
 \end_layout
 
@@ -2357,46 +2675,51 @@ clock cycles
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-time(ms)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.2839
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.377
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.31
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+time(ms) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.2839 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.377 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.31 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.0218
 \end_layout
 
@@ -2410,10 +2733,14 @@ time(ms)
 
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+
 \begin_inset Caption
 
-\begin_layout Plain Layout
+
+\begin_layout Standard
+
 Round trip loopback device
 \end_layout
 
@@ -2428,128 +2755,84 @@ Round trip loopback device
 \end_layout
 
 \begin_layout Subsubsection
+
 Discussion
 \end_layout
 
 \begin_layout Standard
-The ping statistics for both remote and loopback device is better than the
- round trip time.
- As mentioned, in our prediction, this could mainly caused by the fact that
- ICMP is handled through the kernel and TCP is handled in the user address
- space.
- The cost of context switching and crossing address space adds up to the
- difference.
+
+The ping statistics for both remote and loopback device is better than the round trip time. As mentioned, in our prediction, this could mainly caused by the fact that ICMP is handled through the kernel and TCP is handled in the user address space. The cost of context switching and crossing address space adds up to the difference.
 \end_layout
 
 \begin_layout Standard
-We also notice that ping time is an order of magnitude better than round
- trip loopback device time.
- We attribute this fact to the possibility that the ping call wouldn't leave
- the kernel space for the localhost to copy the package data to the network
- card.
- As opposed to the round trip, first we have to call send, which involves
- in a switch to the kernel space.
- The data is then copied to the network card, and triggers an interrupts
- to the user space.
+
+We also notice that ping time is an order of magnitude better than round trip loopback device time. We attribute this fact to the possibility that the ping call wouldn't leave the kernel space for the localhost to copy the package data to the network card. As opposed to the round trip, first we have to call send, which involves in a switch to the kernel space. The data is then copied to the network card, and triggers an interrupts to the user space.
 \end_layout
 
 \begin_layout Standard
-The RTT time for the loopback device could be considered as the OS software
- overhead, as packet is directly copied into the network card.
- The baseline network performance would be the difference between the loopback
- device RTT and the remote RTT.
- According to this logic, the ideal RTT without the OS overhead would be
- (0.79-0.31) = .48ms.
- From this result, we can see that the software overhead is 64.5% of the
- ideal situation.
- However, if we look at the ping performance, the ideal RTT for ping is
- (0.590-0.033) = 0.577ms, the overhead to ideal ratio is only 5.9%.
- This experimentation shows that handling networking protocol insides the
- kernel would have a great impact on the round trip performance.
+
+The RTT time for the loopback device could be considered as the OS software overhead, as packet is directly copied into the network card. The baseline network performance would be the difference between the loopback device RTT and the remote RTT. According to this logic, the ideal RTT without the OS overhead would be (0.79-0.31) = .48ms. From this result, we can see that the software overhead is 64.5% of the ideal situation. However, if we look at the ping performance, the ideal RTT for ping is (0.590-0.033) = 0.577ms, the overhead to ideal ratio is only 5.9%. This experimentation shows that handling networking protocol insides the kernel would have a great impact on the round trip performance.
 \end_layout
 
 \begin_layout Subsection
+
 Peak bandwidth
 \end_layout
 
 \begin_layout Subsubsection
+
 Experiment Setup
 \end_layout
 
 \begin_layout Standard
-We set up two identical instances: a server and a client.
- The client will connect to the target server, and sending various amount
- of data to the servers.
- The amount ranges from 1MB to 400MB.
+
+We set up two identical instances: a server and a client. The client will connect to the target server, and sending various amount of data to the servers. The amount ranges from 1MB to 400MB.
 \end_layout
 
 \begin_layout Standard
-Unlike the previous experiment, we are measuring the performance on the
- server side.
- Server will wait for a connection and starts reading from the the socket.
- After each read, it will record the running total of bytes reading so far
- and the amount of clock cycles to read it.
+
+Unlike the previous experiment, we are measuring the performance on the server side. Server will wait for a connection and starts reading from the the socket. After each read, it will record the running total of bytes reading so far and the amount of clock cycles to read it.
 \end_layout
 
 \begin_layout Standard
-We set the buffer window on the server size to be 20000 bytes.
- We believe that this value is sufficient to make the overhead caused by
- looping to be insignificant.
+
+We set the buffer window on the server size to be 20000 bytes. We believe that this value is sufficient to make the overhead caused by looping to be insignificant.
 \end_layout
 
 \begin_layout Subsubsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-To get an idea of the data transfer rate between two instances, we perform
- a quick scp command between two instances to transfer a 1GB files.
- We notice the TCP connection starts off with the data transfer rate of
- 30MB/s.
- However, it quickly degrade to around 10MB/s.
- We also see that the data transfer rate fluctuate very often.
- So, it is hard to pin down the exact prediction of the average and peak
- bandwidth.
- From the number from SCP experiment, we conjecture that the peak bandwdith
- would be around 30MB/s and the average bandwidth would be around 15MB/s.
+
+To get an idea of the data transfer rate between two instances, we perform a quick scp command between two instances to transfer a 1GB files. We notice the TCP connection starts off with the data transfer rate of 30MB/s. However, it quickly degrade to around 10MB/s. We also see that the data transfer rate fluctuate very often. So, it is hard to pin down the exact prediction of the average and peak bandwidth. From the number from SCP experiment, we conjecture that the peak bandwdith would be around 30MB/s and the average bandwidth would be around 15MB/s.
 \end_layout
 
 \begin_layout Subsubsection
+
 Results
 \end_layout
 
 \begin_layout Standard
-Figure shows the bandwidth corresponding to the total data size sent and
- Figure shows the same image for the loopback device.
+
+Figure shows the bandwidth corresponding to the total data size sent and Figure shows the same image for the loopback device.
 \end_layout
 
 \begin_layout Standard
+
+
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename bandwidth.jpg
 
-\end_inset
+\begin_layout Standard
 
 
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-Bandwidth for remote case vs.
- total data size transfer
-\end_layout
-
-\end_inset
-
-
-\end_layout
+\begin_inset Graphics 
+	filename bandwidth.eps
 
 \end_inset
 
@@ -2557,34 +2840,59 @@ Bandwidth for remote case vs.
 \end_layout
 
 \begin_layout Standard
+
+
+\begin_inset Caption
+
+
+\begin_layout Standard
+
+Bandwidth for remote case vs. total data size transfer
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+
 \begin_inset Float figure
 wide false
 sideways false
 status open
 
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename bandwidth.loopback.jpg
+
+\begin_layout Standard
+
+
+\begin_inset Graphics 
+	filename bandwidth.loopback.eps
 
 \end_inset
 
 
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+
 \begin_inset Caption
 
-\begin_layout Plain Layout
-Bandwidth for loopback case vs.
- total data size transfer
+
+\begin_layout Standard
+
+Bandwidth for loopback case vs. total data size transfer
 \end_layout
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -2594,64 +2902,58 @@ Bandwidth for loopback case vs.
 \end_layout
 
 \begin_layout Subsubsection
+
 Discussion
 \end_layout
 
 \begin_layout Standard
-For the remote case, we get the peak bandwidth at 30MBps and a huge drop-off
- after the 150MB point to around 10MBps.
- This is due to the TCP implementation, where they would allow the connection
- proceeds with a higher speed at first, then slowly takes away the bandwidth.
- While the loopback decide maintains a fairly high bandwidth between 900MBps
- and 1.1Gbps
+
+For the remote case, we get the peak bandwidth at 30MBps and a huge drop-off after the 150MB point to around 10MBps. This is due to the TCP implementation, where they would allow the connection proceeds with a higher speed at first, then slowly takes away the bandwidth. While the loopback decide maintains a fairly high bandwidth between 900MBps and 1.1Gbps
 \end_layout
 
 \begin_layout Standard
-As the packet are delivered directly to the network card in the loopback
- case, we can use the data for loopback device as the software overhead
- of the network.
- In order to see what ideal performance of the network, we look at the data
- points with the highest bandwidth and compare the clock cycles from the
- same settings.
- For example, we look at the data point where data size is 100MB, the difference
- in clock cycles to transmit that data is (8309437712 - 232012888) = 8077424824
- cycles.
- So the OS overhead is extremely small in this case, 2% of the ideal.
- The slowdown in bandwidth is mostly due to network transaction.
+
+As the packet are delivered directly to the network card in the loopback case, we can use the data for loopback device as the software overhead of the network. In order to see what ideal performance of the network, we look at the data points with the highest bandwidth and compare the clock cycles from the same settings. For example, we look at the data point where data size is 100MB, the difference in clock cycles to transmit that data is (8309437712 - 232012888) = 8077424824 cycles. So the OS overhead is extremely small in this case, 2% of the ideal. The slowdown in bandwidth is mostly due to network transaction.
 \end_layout
 
 \begin_layout Subsection
+
 Connection overhead
 \end_layout
 
 \begin_layout Standard
-To set up a connection, TCP uses the three-way handshake:
+
+To set up a connection, TCP uses the three-way handshake: 
 \end_layout
 
 \begin_layout Enumerate
-The client sends the SYN to the server
+
+The client sends the SYN to the server 
 \end_layout
 
 \begin_layout Enumerate
-Server responds with SYN-ACK.
+
+Server responds with SYN-ACK. 
 \end_layout
 
 \begin_layout Enumerate
-Client responds with ACK.
+
+Client responds with ACK. 
 \end_layout
 
 \begin_layout Standard
+
 To tear down a connection, TCP uses the 2 pairs of FIN and ACK.
 \end_layout
 
 \begin_layout Subsubsection
+
 Experiment Setup
 \end_layout
 
 \begin_layout Standard
-This experiment setup is similar the setup in measuring the round trip time.
- We have two identical instances: server and client.
- We measure the two calls, 
+
+This experiment setup is similar the setup in measuring the round trip time. We have two identical instances: server and client. We measure the two calls, 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2667,226 +2969,224 @@ close()
 \begin_inset Quotes erd
 \end_inset
 
-.
- Clients try to call connect to the server's IP.
- Once it gets the connections, it records the statistics.
- Then, it calls close() on the file descriptor, records the statistics for
- tearing down a connection and quit.
+. Clients try to call connect to the server's IP. Once it gets the connections, it records the statistics. Then, it calls close() on the file descriptor, records the statistics for tearing down a connection and quit.
 \end_layout
 
 \begin_layout Standard
+
 We run this experiment 1000 times.
 \end_layout
 
 \begin_layout Subsubsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-According to the socket API, the connects blocks and waits for the SYN-ACK.
- So the time for a successful connection establishment would be around two
- roundtrip times.
- Even though connection termination also requires one roundtrip to complete
- the FIN and ACK, close() call was implemented such that the finalization
- of the connection termination is pushed down to the kernel level.
- So we expects that the connection termination times would be significantly
- faster than the connection establishment time.
+
+According to the socket API, the connects blocks and waits for the SYN-ACK. So the time for a successful connection establishment would be around two roundtrip times. Even though connection termination also requires one roundtrip to complete the FIN and ACK, close() call was implemented such that the finalization of the connection termination is pushed down to the kernel level. So we expects that the connection termination times would be significantly faster than the connection establishment time.
 \end_layout
 
 \begin_layout Subsubsection
+
 Results
 \end_layout
 
 \begin_layout Standard
-For loopback devices
+
+For loopback devices 
 \end_layout
 
 \begin_layout Enumerate
+
 Connection setup:
 \end_layout
 
 \begin_deeper
 \begin_layout Enumerate
-Clock cycles(min/avg/max/std): 794200 / 821370 / 1041488 / 46339
+
+Clock cycles(min/avg/max/std): 794200 / 821370 / 1041488 / 46339 
 \end_layout
 
 \begin_layout Enumerate
-Time in ms (min/avg/max/std): .3054 / 0.3159 / 0.4005 / 0.0178
+
+Time in ms (min/avg/max/std): .3054 / 0.3159 / 0.4005 / 0.0178 
 \end_layout
 
 \end_deeper
 \begin_layout Enumerate
+
 Connection teardown:
 \end_layout
 
 \begin_deeper
 \begin_layout Enumerate
-Clock cycles(min/avg/max/std): 56072 / 66172 / 100328 / 11630
+
+Clock cycles(min/avg/max/std): 56072 / 66172 / 100328 / 11630 
 \end_layout
 
 \begin_layout Enumerate
-Time in ms (min/avg/max/std): 0.021 / 0.025 / 0.038 / 0.0044
+
+Time in ms (min/avg/max/std): 0.021 / 0.025 / 0.038 / 0.0044 
 \end_layout
 
 \end_deeper
 \begin_layout Standard
-For remote connection
+
+For remote connection 
 \end_layout
 
 \begin_layout Enumerate
+
 Connection setup:
 \end_layout
 
 \begin_deeper
 \begin_layout Enumerate
-Clock cycles(min/avg/max/std): 804200 / 1248600 / 13799088 / 1741300
+
+Clock cycles(min/avg/max/std): 804200 / 1248600 / 13799088 / 1741300 
 \end_layout
 
 \begin_layout Enumerate
-Time in ms (min/avg/max/std): .0.309 / .48024 / 5.01 / 0.669730769
+
+Time in ms (min/avg/max/std): .0.309 / .48024 / 5.01 / 0.669730769 
 \end_layout
 
 \end_deeper
 \begin_layout Enumerate
+
 Connection teardown:
 \end_layout
 
 \begin_deeper
 \begin_layout Enumerate
-Clock cycles(min/avg/max/std): 32856 / 51060 / 158280 / 23913
+
+Clock cycles(min/avg/max/std): 32856 / 51060 / 158280 / 23913 
 \end_layout
 
 \begin_layout Enumerate
-Time in ms (min/avg/max/std): 0.01264 / 0.019 / 0.0608 / 0.00919
+
+Time in ms (min/avg/max/std): 0.01264 / 0.019 / 0.0608 / 0.00919 
 \end_layout
 
 \end_deeper
 \begin_layout Subsubsection
+
 Discussion
 \end_layout
 
 \begin_layout Standard
-The connection setup cost is half the roundtrip time we gather earlier.
- We attribute this the fact that part of the connect calls in handle in
- the kernel.
- The evidence that these numbers match the ping statistics better than our
- round trip implementation statistics.
+
+The connection setup cost is half the roundtrip time we gather earlier. We attribute this the fact that part of the connect calls in handle in the kernel. The evidence that these numbers match the ping statistics better than our round trip implementation statistics.
 \end_layout
 
 \begin_layout Standard
-For the connection teardown time, we notice the number is an order of magnitude
- lesser than the connection setup times.
- As predicted, the socket calls return immediately to the user, and let
- the kernel handle the main termination.
+
+For the connection teardown time, we notice the number is an order of magnitude lesser than the connection setup times. As predicted, the socket calls return immediately to the user, and let the kernel handle the main termination.
 \end_layout
 
 \begin_layout Standard
-Similar to before, we can use the loopback statistics to be the OS overhead.
- So the baseline network connection establishment performance is 0.48024-0.3159
- = 0.16434.
- In our experiment, we couldn't establish the baseline performance of the
- network regarding the tearing down of a connection due to the fact that
- the close all returns immediately.
- As the number suggests, the close call in the remote case and the loopback
- case yields very similar statistics.
+
+Similar to before, we can use the loopback statistics to be the OS overhead. So the baseline network connection establishment performance is 0.48024-0.3159 = 0.16434. In our experiment, we couldn't establish the baseline performance of the network regarding the tearing down of a connection due to the fact that the close all returns immediately. As the number suggests, the close call in the remote case and the loopback case yields very similar statistics.
 \end_layout
 
 \begin_layout Section
+
 File System Operations:
 \end_layout
 
 \begin_layout Subsection
 
-\series bold
 Size of File Cache:
 \end_layout
 
 \begin_layout Subsubsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-Size of file cache should be some fraction of the memory (RAM) in the system.
- Kernel reserves some memory ( in terms of data structures it uses and say
- by the paging dameon).
- Bottomline, we expect it to be some fraction of RAM on system.
- 
+
+Size of file cache should be some fraction of the memory (RAM) in the system. Kernel reserves some memory ( in terms of data structures it uses and say by the paging dameon). Bottomline, we expect it to be some fraction of RAM on system.
 \end_layout
 
 \begin_layout Subsubsection
+
 Experiment
 \end_layout
 
 \begin_layout Standard
-The idea is to bring all the pages of the file in file cache and read it
- again.
- As long as the entire file can fit in the file cache, we will see similar
- per block read numbers.
- But as soon as we read a file, some pages will have to be fetched from
- disk and not the file cache.
- Thus we will see a bump in the read numbers.
- The following steps describe the experiment: 
+
+The idea is to bring all the pages of the file in file cache and read it again. As long as the entire file can fit in the file cache, we will see similar per block read numbers. But as soon as we read a file, some pages will have to be fetched from disk and not the file cache. Thus we will see a bump in the read numbers. The following steps describe the experiment: 
 \end_layout
 
 \begin_layout Itemize
-Step1: Read a file of say size 100M sequentially.
- This will bring in the entire file in the file cache
+
+Step1: Read a file of say size 100M sequentially. This will bring in the entire file in the file cache
 \end_layout
 
 \begin_deeper
 \begin_layout Itemize
-Step2: Read the same file again, measure the time to read it
+
+Step2: Read the same file again, measure the time to read it 
 \end_layout
 
 \begin_layout Itemize
-Step 3: Increase the file size, repeat Step 1 and Step 2.
- 
+
+Step 3: Increase the file size, repeat Step 1 and Step 2. 
 \end_layout
 
 \begin_layout Itemize
-Step 4: Continue Step 3, after a while when file size is larger than file
- cache, the per block read time will increase
+
+Step 4: Continue Step 3, after a while when file size is larger than file cache, the per block read time will increase 
 \end_layout
 
 \begin_layout Itemize
-Step 5: Plot per block read time as function of file size
+
+Step 5: Plot per block read time as function of file size 
 \end_layout
 
 \end_deeper
 \begin_layout Subsubsection
+
 Results: 
 \end_layout
 
 \begin_layout Standard
-\begin_inset Tabular
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="13" columns="3">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-File Size (MB)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-CPU Cycles / MB
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+File Size (MB) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+CPU Cycles / MB 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 Time (ms)
 \end_layout
 
@@ -2894,28 +3194,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-150
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1424800
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+150 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+1424800 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 50
 \end_layout
 
@@ -2923,28 +3226,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-200
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-4325000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+200 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+4325000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 1.6
 \end_layout
 
@@ -2952,28 +3258,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-250
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-7284000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+250 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+7284000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 2.7
 \end_layout
 
@@ -2981,28 +3290,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-300
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-35256000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+300 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+35256000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 13.1
 \end_layout
 
@@ -3010,28 +3322,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-350
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-34762000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+350 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+34762000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 12.9
 \end_layout
 
@@ -3039,28 +3354,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-400
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-30081000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+400 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+30081000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 11.1
 \end_layout
 
@@ -3068,28 +3386,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-450
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-36080000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+450 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+36080000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 13.4
 \end_layout
 
@@ -3097,28 +3418,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-500
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-28269000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+500 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+28269000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 10.5
 \end_layout
 
@@ -3126,28 +3450,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-550
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-29327000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+550 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+29327000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 10.9
 \end_layout
 
@@ -3155,28 +3482,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-600
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-27972000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+600 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+27972000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 10.4
 \end_layout
 
@@ -3184,28 +3514,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-650
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-31478000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+650 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+31478000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 11.7
 \end_layout
 
@@ -3213,28 +3546,31 @@ Time (ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-700
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-30541000
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+700 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+30541000 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 11.3
 \end_layout
 
@@ -3250,116 +3586,142 @@ Time (ms)
 
 \begin_layout Standard
 
+
 \series bold
-\begin_inset Graphics
-	filename res4_1.jpg
+
+\begin_inset Graphics 
+	filename res4_1.eps
 	scale 50
 
 \end_inset
 
 
+\series default
+
 \end_layout
 
 \begin_layout Subsubsection
+
 Analyis :
 \end_layout
 
 \begin_layout Standard
-The graph clearly shows that as file size reaches 300M we see a bump in
- the average read time.
- The RAM in our system is close to 500M, thus file cache of 300M seems to
- be a pretty convincing result.
+
+The graph clearly shows that as file size reaches 300M we see a bump in the average read time. The RAM in our system is close to 500M, thus file cache of 300M seems to be a pretty convincing result.
 \end_layout
 
 \begin_layout Subsection
 
-\series bold
 File Read time:
 \end_layout
 
 \begin_layout Subsubsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-We expect file read time to be worse for a random read when compared to
- a sequential read (when we don't use file cache).
- This is beacuse sequential read on disk involves less seek time.
+
+We expect file read time to be worse for a random read when compared to a sequential read (when we don't use file cache). This is beacuse sequential read on disk involves less seek time.
 \end_layout
 
 \begin_layout Subsubsection
+
 Experiment
 \end_layout
 
 \begin_layout Enumerate
+
 Open a file in O_DIRECT mode, this ensures that no file cache is used
 \end_layout
 
 \begin_deeper
 \begin_layout Enumerate
-Read the file sequentially, measure time
+
+Read the file sequentially, measure time 
 \end_layout
 
 \begin_layout Enumerate
-Read the file randomly (using preads) and generating a random offset, measure
- time
+
+Read the file randomly (using preads) and generating a random offset, measure time 
 \end_layout
 
 \begin_layout Enumerate
+
 Repeat (a) - (c) by increasing the size of file
 \end_layout
 
+\end_deeper
+\begin_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
-\begin_inset Tabular
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+{
+\end_layout
+
+\end_inset
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="9" columns="5">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-File Size(MB)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Sequential (CPU Cycles)(Million)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Sequential Time(ms)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Random (CPU Cycles)
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+File Size(MB) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Sequential (CPU Cycles)(Million) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Sequential Time(ms) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+Random (CPU Cycles) 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 Random(ms)
 \end_layout
 
@@ -3367,46 +3729,51 @@ Random(ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-32
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.584
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.2163
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.597
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+32 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.584 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.2163 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.597 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.2212
 \end_layout
 
@@ -3414,46 +3781,51 @@ Random(ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-64
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.587
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.2212
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.598
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+64 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.587 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.2212 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.598 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.2218
 \end_layout
 
@@ -3461,46 +3833,51 @@ Random(ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-150
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.591
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.2190
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.601
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+150 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.591 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.2190 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.601 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.2229
 \end_layout
 
@@ -3508,46 +3885,51 @@ Random(ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-200
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.591
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.2192
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.619
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+200 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.591 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.2192 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.619 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.2296
 \end_layout
 
@@ -3555,46 +3937,51 @@ Random(ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-250
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.613
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.2273
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.645
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+250 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.613 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.2273 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.645 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.2391
 \end_layout
 
@@ -3602,46 +3989,51 @@ Random(ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-300
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.616
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.2285
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.615
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+300 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.616 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.2285 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.615 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.2279
 \end_layout
 
@@ -3649,46 +4041,51 @@ Random(ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-400
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.588
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.2179
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-.609
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+400 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.588 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.2179 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+.609 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.2257
 \end_layout
 
@@ -3696,48 +4093,28 @@ Random(ms)
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
-\end_layout
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\end_inset
+</cell>
+<cell alignment="none" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
 
 \end_inset
 </cell>
@@ -3747,116 +4124,144 @@ Random(ms)
 \end_inset
 
 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Standard
+
+}
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset space ~
+
+\end_inset
+
+ 
 \end_layout
 
 \end_deeper
 \begin_layout Enumerate
-\begin_inset Graphics
-	filename res4_2.jpg
+
+
+\begin_inset Graphics 
+	filename res4_2.eps
 	scale 50
 
 \end_inset
 
-
+ 
 \end_layout
 
 \begin_layout Subsubsection
+
 Analysis
 \end_layout
 
 \begin_layout Standard
-It seems from the graph that sequential writes work little bit better than
- random writes.
+
+It seems from the graph that sequential writes work little bit better than random writes.
 \end_layout
 
 \begin_layout Subsection
 
-\series bold
 Remote file read time
 \end_layout
 
 \begin_layout Subsubsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-Network penalty is going to overshadow any difference between sequantial
- and random read.
- Also, we predict that network penalty is going to be very high.
+
+Network penalty is going to overshadow any difference between sequantial and random read. Also, we predict that network penalty is going to be very high.
 \end_layout
 
 \begin_layout Subsubsection
+
 Experiment
 \end_layout
 
 \begin_layout Itemize
-Continuing the setup of last experiment, start a nfs server and share a
- folder across network
+
+Continuing the setup of last experiment, start a nfs server and share a folder across network 
 \end_layout
 
 \begin_layout Itemize
-Mount the shared folder on a client
+
+Mount the shared folder on a client 
 \end_layout
 
 \begin_layout Itemize
-Read files in increasing order of size from the client, measure time to
- do sequential as well as random read
+
+Read files in increasing order of size from the client, measure time to do sequential as well as random read 
 \end_layout
 
 \begin_layout Subsubsection
+
 Results:
 \end_layout
 
 \begin_layout Standard
-\begin_inset Tabular
+
+
+\begin_inset Tabular 
 <lyxtabular version="3" rows="7" columns="5">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features>
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-File Size(MB)
+\begin_layout Standard
+
+File Size(MB) 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-CPU Cycles - Sequential(Million)
+\begin_layout Standard
+
+CPU Cycles - Sequential(Million) 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Time(s) 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
-CPU Cycles- Random (M)
+\begin_layout Standard
+
+CPU Cycles- Random (M) 
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" bottomline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
 Time
 \end_layout
 
@@ -3864,46 +4269,51 @@ Time
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-32
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2555
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.9465
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2885
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+32 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2555 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.9465 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2885 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 1.0686
 \end_layout
 
@@ -3911,46 +4321,51 @@ Time
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-64
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2456
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.9099
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2617
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+64 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2456 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.9099 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2617 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.9694
 \end_layout
 
@@ -3958,46 +4373,51 @@ Time
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-150
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2933
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1.0861
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2673
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+150 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2933 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+1.0861 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2673 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 0.9898
 \end_layout
 
@@ -4005,46 +4425,51 @@ Time
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-200
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2830
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1.0485
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2816
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+200 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2830 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+1.0485 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2816 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 1.0430
 \end_layout
 
@@ -4052,46 +4477,51 @@ Time
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-250
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-3012
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1.1171
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2915
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+250 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+3012 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+1.1171 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2915 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 1.0795
 \end_layout
 
@@ -4099,46 +4529,51 @@ Time
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-300
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2569
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0.9515
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-2837
-\end_layout
-
-\end_inset
-</cell>
 <cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
-\begin_layout Plain Layout
+\begin_layout Standard
+
+300 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2569 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+0.9515 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
+2837 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Standard
+
 1.0509
 \end_layout
 
@@ -4153,8 +4588,10 @@ Time
 \end_layout
 
 \begin_layout Standard
-\begin_inset Graphics
-	filename res4_3.jpg
+
+
+\begin_inset Graphics 
+	filename res4_3.eps
 	scale 50
 
 \end_inset
@@ -4163,89 +4600,85 @@ Time
 \end_layout
 
 \begin_layout Subsubsection
+
 Analysis
 \end_layout
 
 \begin_layout Standard
-Network Penalty seems to be of the order of 0.8 seconds.
- Read time for one block was in milliseconds, but over NFS this is in terms
- of seconds.
- Also, its interesting to note that affect of random read has been nullified.
+
+Network Penalty seems to be of the order of 0.8 seconds. Read time for one block was in milliseconds, but over NFS this is in terms of seconds. Also, its interesting to note that affect of random read has been nullified.
 \end_layout
 
 \begin_layout Subsection
 
-\series bold
 Measuring contention:
 \end_layout
 
 \begin_layout Standard
-We are measuring the effect on read operation time when number of processes
- reading potentially different files in the same filesystem (hence the same
- 2disk) increase.
+
+We are measuring the effect on read operation time when number of processes reading potentially different files in the same filesystem (hence the same 2disk) increase.
 \end_layout
 
 \begin_layout Subsubsection
+
 Prediction
 \end_layout
 
 \begin_layout Standard
-We expect read time to increase as number of processes in the system (doing
- some read operation) increase.
- As number of processes increase they will cause the disk head to move more
- and thus from the perspective of one process seek time will increase -
- even when it is doing a sequential access.
- However there might not be a direct correlation with number of processes.
- All we predict is that we are going to see increase in read time as there
- are other processes reading on the disk.
+
+We expect read time to increase as number of processes in the system (doing some read operation) increase. As number of processes increase they will cause the disk head to move more and thus from the perspective of one process seek time will increase - even when it is doing a sequential access. However there might not be a direct correlation with number of processes. All we predict is that we are going to see increase in read time as there are other processes reading on the disk.
 \end_layout
 
 \begin_layout Subsubsection
+
 Experiment 
 \end_layout
 
 \begin_layout Itemize
-Set block size as 4K.
- Note that this does not need to be 4K, but when measuring time per block
- size, we would make this block size as fixed so that we are comparing the
- same quantities
+
+Set block size as 4K. Note that this does not need to be 4K, but when measuring time per block size, we would make this block size as fixed so that we are comparing the same quantities 
 \end_layout
 
 \begin_layout Itemize
-Create a file of 100M.
- Read it for a fixed number of iterations (Do repeated reads on this file)
+
+Create a file of 100M. Read it for a fixed number of iterations (Do repeated reads on this file) 
 \end_layout
 
 \begin_layout Itemize
-Open all files for this experiment using O_DIRECT.
- This ensures that we are not using file cache and are directly accessing
- disk
+
+Open all files for this experiment using O_DIRECT. This ensures that we are not using file cache and are directly accessing disk 
 \end_layout
 
 \begin_layout Itemize
-Measure time taken to read one block when 1 other process is reading a file
- (this file is differnt than first process
+
+Measure time taken to read one block when 1 other process is reading a file (this file is differnt than first process 
 \end_layout
 
 \begin_layout Itemize
-Measure time to read when 2 processes are reading 2 different files
+
+Measure time to read when 2 processes are reading 2 different files 
 \end_layout
 
 \begin_layout Itemize
-Continue this experiment by reading a file when 20 processes are running.
+
+Continue this experiment by reading a file when 20 processes are running. 
 \end_layout
 
 \begin_layout Itemize
-Compare results
+
+Compare results 
 \end_layout
 
 \begin_layout Subsubsection
+
 Results
 \end_layout
 
 \begin_layout Standard
-\begin_inset Graphics
-	filename res1.jpg
+
+
+\begin_inset Graphics 
+	filename res1.eps
 	scale 50
 
 \end_inset
@@ -4254,58 +4687,52 @@ Results
 \end_layout
 
 \begin_layout Subsubsection
+
 Analysis
 \end_layout
 
 \begin_layout Standard
-Graph shows that as number of processes increase the variations in reading
- time increase too.
- Thus our original prediction that as more processes try to read a file
- on sam disk, seek time should vary a lot, seems correct
+
+Graph shows that as number of processes increase the variations in reading time increase too. Thus our original prediction that as more processes try to read a file on sam disk, seek time should vary a lot, seems correct 
 \end_layout
 
 \begin_layout Bibliography
-\labelwidthstring References
+
+
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
+label ""
 key "key-2"
 
 \end_inset
 
-Larry McVoy and Carl Staelin, lmbench: Portable Tools for Performance Analysis,
- Proc.
- of USENIX Annual Technical Conference, January 1996.
+Larry McVoy and Carl Staelin, lmbench: Portable Tools for Performance Analysis, Proc. of USENIX Annual Technical Conference, January 1996.
 \end_layout
 
 \begin_layout Bibliography
-\labelwidthstring References
+
+
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
+label ""
 key "key-3"
 
 \end_inset
 
-Aaron B.
- Brown and Margo I.
- Seltzer, Operating system benchmarking in the wake of lmbench: a case study
- of the performance of NetBSD on the Intel x86 architecture, Proc.
- of ACM SIGMETRICS, pp.
- 214-224, June 1997.
+Aaron B. Brown and Margo I. Seltzer, Operating system benchmarking in the wake of lmbench: a case study of the performance of NetBSD on the Intel x86 architecture, Proc. of ACM SIGMETRICS, pp. 214-224, June 1997.
 \end_layout
 
 \begin_layout Bibliography
-\labelwidthstring References
+
+
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
+label ""
 key "key-5"
 
 \end_inset
 
-John K.
- Ousterhout, Why Aren't Operating Systems Getting Faster as Fast as Hardware?,
- Proc.
- of USENIX Summer Conference, pp.
- 247-256, June 1990.
+John K. Ousterhout, Why Aren't Operating Systems Getting Faster as Fast as Hardware?, Proc. of USENIX Summer Conference, pp. 247-256, June 1990.
 \end_layout
 
 \end_body
